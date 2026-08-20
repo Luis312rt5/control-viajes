@@ -16,7 +16,29 @@
  * en volver a responder al primer request — con 5s, esa primera llamada
  * (p. ej. el primer login del día) fallaría por timeout aunque el servicio
  * esté sano, solo dormido.
+ *
+ * Reintento en frío: mientras un servicio Free está "despertando", a veces
+ * la primera respuesta que llega no es la de la app (es una página HTML de
+ * espera de la infraestructura), así que el body no es JSON válido. Antes
+ * eso tiraba un SyntaxError sin manejar que terminaba como 500 genérico sin
+ * explicación. Ahora, si el body no parsea como JSON, se espera un poco y
+ * se reintenta una vez (tiempo típico de arranque en frío) antes de
+ * reportar el error.
  */
+const COLD_START_RETRY_DELAY_MS = 4000;
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function tryParseJson(text: string): unknown {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return undefined;
+  }
+}
+
 export class InternalHttpClient {
   constructor(
     private readonly baseUrl: string,
@@ -24,11 +46,11 @@ export class InternalHttpClient {
     private readonly timeoutMs = 20000,
   ) {}
 
-  private async request<T>(
+  private async fetchOnce(
     method: string,
     path: string,
     body?: unknown,
-  ): Promise<T> {
+  ): Promise<{ status: number; ok: boolean; rawText: string }> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), this.timeoutMs);
 
@@ -55,13 +77,40 @@ export class InternalHttpClient {
       clearTimeout(timer);
     }
 
-    const text = await response.text();
-    const data = text ? JSON.parse(text) : null;
+    const rawText = await response.text();
+    return { status: response.status, ok: response.ok, rawText };
+  }
 
-    if (!response.ok) {
+  private async request<T>(
+    method: string,
+    path: string,
+    body?: unknown,
+  ): Promise<T> {
+    let result = await this.fetchOnce(method, path, body);
+    let data = result.rawText ? tryParseJson(result.rawText) : null;
+
+    if (result.rawText && data === undefined) {
+      // Probable arranque en frío: lo que llegó no fue JSON. Se reintenta
+      // una vez, dándole tiempo al servicio a terminar de arrancar.
+      await delay(COLD_START_RETRY_DELAY_MS);
+      result = await this.fetchOnce(method, path, body);
+      data = result.rawText ? tryParseJson(result.rawText) : null;
+    }
+
+    if (result.rawText && data === undefined) {
+      // Ni el reintento devolvió JSON válido: error claro en vez de un
+      // SyntaxError sin manejar.
       throw {
-        statusCode: (data && data.statusCode) || response.status,
-        message: (data && data.message) || 'Error en un servicio interno',
+        statusCode: 503,
+        message:
+          'El servicio interno está iniciando, por favor intenta de nuevo en unos segundos',
+      };
+    }
+
+    if (!result.ok) {
+      throw {
+        statusCode: (data && (data as any).statusCode) || result.status,
+        message: (data && (data as any).message) || 'Error en un servicio interno',
       };
     }
 
