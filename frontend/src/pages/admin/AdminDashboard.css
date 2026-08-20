@@ -1,0 +1,74 @@
+.admin-dashboard__toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.admin-dashboard__toolbar h2 {
+  font-family: var(--font-display);
+  margin: 0;
+}
+
+.admin-dashboard__toolbar p {
+  color: var(--color-text-muted);
+  margin: 4px 0 0 0;
+  font-size: 0.85rem;
+}
+
+.admin-dashboard__empty {
+  color: var(--color-text-muted);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.admin-table thead {
+  background: var(--color-surface-alt);
+}
+
+.admin-table th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  padding: var(--space-3) var(--space-4);
+}
+
+.admin-table td {
+  padding: var(--space-3) var(--space-4);
+  border-top: var(--border-width) solid var(--color-border);
+  font-size: 0.9rem;
+}
+
+.admin-table__row {
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.admin-table__row:hover {
+  background: var(--color-surface-alt);
+}
+
+.admin-table__code {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.admin-dashboard__pagination {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  justify-content: center;
+}

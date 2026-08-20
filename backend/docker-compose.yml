@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: viajes-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_MULTIPLE_DATABASES: trips_db,operations_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  trips-service:
+    build: ./trips-service
+    container_name: viajes-trips-service
+    restart: unless-stopped
+    environment:
+      PORT: 3001
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: trips_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - '3001:3001'
+
+  operations-service:
+    build: ./operations-service
+    container_name: viajes-operations-service
+    restart: unless-stopped
+    environment:
+      PORT: 3002
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: operations_db
+      TRIPS_SERVICE_HOST: trips-service
+      TRIPS_SERVICE_PORT: 3001
+    depends_on:
+      postgres:
+        condition: service_healthy
+      trips-service:
+        condition: service_started
+    ports:
+      - '3002:3002'
+
+  gateway:
+    build: ./gateway
+    container_name: viajes-gateway
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      JWT_SECRET: super_secret_key_change_in_production
+      TRIPS_SERVICE_HOST: trips-service
+      TRIPS_SERVICE_PORT: 3001
+      OPERATIONS_SERVICE_HOST: operations-service
+      OPERATIONS_SERVICE_PORT: 3002
+    depends_on:
+      - trips-service
+      - operations-service
+    ports:
+      - '3000:3000'
+
+volumes:
+  postgres_data:

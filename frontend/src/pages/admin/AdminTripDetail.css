@@ -1,0 +1,23 @@
+.admin-trip-detail__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+
+.admin-trip-detail__header h2 {
+  font-family: var(--font-display);
+  margin: 0 0 4px 0;
+}
+
+.admin-trip-detail__header p {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.admin-trip-detail__qr {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-5);
+}

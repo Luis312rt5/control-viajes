@@ -1,0 +1,36 @@
+.signature-pad {
+  background: var(--color-surface);
+  border: var(--border-width) dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.signature-pad--disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.signature-pad__hint {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-3) 0;
+}
+
+.signature-pad__canvas-wrap {
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.signature-pad__canvas {
+  width: 100%;
+  height: 180px;
+  touch-action: none;
+}
+
+.signature-pad__actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  justify-content: flex-end;
+}

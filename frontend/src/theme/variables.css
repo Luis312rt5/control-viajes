@@ -1,0 +1,239 @@
+/*
+  Sistema de tokens del proyecto "Control de Viajes".
+  Dirección visual: dashboard SaaS premium — fondos profundos, tarjetas
+  elevadas con bordes sutiles, resplandor de marca en acciones clave,
+  header con efecto vidrio (glassmorphism). Acento: verde Nodotech.
+
+  Tres modos disponibles vía atributo en <html data-theme="...">:
+    - light    (operación de día, uso del Administrador en escritorio)
+    - dark     (uso del Conductor de noche/en ruta) — el modo "premium" principal
+    - custom   (colores editables en tiempo real desde el selector de tema)
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap');
+
+:root {
+  /* Tipografía */
+  --font-display: 'Space Grotesk', 'Arial Narrow', sans-serif;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  /* Radios suaves tipo dashboard SaaS (antes eran más rectos/"señal vial") */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* Acento de marca (Nodotech) — se mantiene en los 3 temas */
+  --color-accent: #0F8E6A;
+  --color-accent-shade: #0D7D5D;
+  --color-accent-tint: #279973;
+  --color-accent-ink: #F5FBF9;
+  --color-accent-glow: rgba(15, 142, 106, 0.45);
+
+  /* Semánticos de estado (comunes a los 3 temas) */
+  --color-success: #2E9E5B;
+  --color-warning: #F5A623;
+  --color-warning-ink: #3A2400;
+  --color-danger: #E5484D;
+  --color-info: #3B82C4;
+  --color-neutral: #6B7280;
+
+  --border-width: 1px;
+
+  /* ==== Paleta estándar de Ionic, mapeada a nuestros tokens ====
+     Sin esto, componentes como ion-badge, ion-segment o los estados
+     "activated"/"hover" de ion-button usan la paleta azul/amarilla por
+     defecto de Ionic en vez de la marca Nodotech. */
+  --ion-color-primary: var(--color-accent);
+  --ion-color-primary-rgb: 15, 142, 106;
+  --ion-color-primary-contrast: var(--color-accent-ink);
+  --ion-color-primary-contrast-rgb: 245, 251, 249;
+  --ion-color-primary-shade: var(--color-accent-shade);
+  --ion-color-primary-tint: var(--color-accent-tint);
+
+  --ion-color-success: var(--color-success);
+  --ion-color-success-rgb: 46, 158, 91;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #288b50;
+  --ion-color-success-tint: #43a86b;
+
+  --ion-color-warning: var(--color-warning);
+  --ion-color-warning-rgb: 245, 166, 35;
+  --ion-color-warning-contrast: var(--color-warning-ink);
+  --ion-color-warning-contrast-rgb: 58, 36, 0;
+  --ion-color-warning-shade: #d8921f;
+  --ion-color-warning-tint: #f6af39;
+
+  --ion-color-danger: var(--color-danger);
+  --ion-color-danger-rgb: 229, 72, 77;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #c93f44;
+  --ion-color-danger-tint: #e85a5f;
+
+  --ion-color-medium: var(--color-neutral);
+  --ion-color-medium-rgb: 107, 114, 128;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #5e6471;
+  --ion-color-medium-tint: #7a808d;
+
+  --ion-color-dark: #0b0d11;
+  --ion-color-dark-rgb: 11, 13, 17;
+  --ion-color-dark-contrast: #f2f1ed;
+  --ion-color-dark-contrast-rgb: 242, 241, 237;
+  --ion-color-dark-shade: #09090c;
+  --ion-color-dark-tint: #24262c;
+}
+
+/* ============ MODO CLARO (Administrador / escritorio) ============ */
+:root[data-theme='light'] {
+  --color-bg: #F4F5F4;
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #ECEDEC;
+  --color-border: rgba(20, 22, 27, 0.1);
+  --color-text: #14161B;
+  --color-text-muted: #5B5D57;
+  --color-header-bg: #0B0D11;
+  --color-header-text: #F2F1ED;
+  --shadow-card: 0 1px 2px rgba(20, 22, 27, 0.04), 0 12px 28px rgba(20, 22, 27, 0.08);
+  --header-glass-bg: rgba(11, 13, 17, 0.85);
+}
+
+/* ============ MODO OSCURO (Conductor / en ruta) — "premium" ============ */
+:root[data-theme='dark'] {
+  --color-bg: #0B0D11;
+  --color-surface: #14171D;
+  --color-surface-alt: #1B1F27;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-text: #EDEEF0;
+  --color-text-muted: #9AA0AC;
+  --color-header-bg: #0B0D11;
+  --color-header-text: #F2F1ED;
+  --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.45);
+  --header-glass-bg: rgba(11, 13, 17, 0.7);
+}
+
+/* ============ MODO PERSONALIZADO ============ */
+/* Valores iniciales; el ThemeSwitcher los sobreescribe en runtime vía JS
+   (document.documentElement.style.setProperty) y persiste en localStorage. */
+:root[data-theme='custom'] {
+  --color-bg: #0B0D11;
+  --color-surface: #14171D;
+  --color-surface-alt: #1B1F27;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-text: #EDEEF0;
+  --color-text-muted: #9AA0AC;
+  --color-header-bg: #0B0D11;
+  --color-header-text: #F2F1ED;
+  --color-accent: #0F8E6A;
+  --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.45);
+  --header-glass-bg: rgba(11, 13, 17, 0.7);
+}
+
+/* Reset ligero + anulación deliberada de defaults de Ionic */
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+ion-content {
+  --background: var(--color-bg);
+  --color: var(--color-text);
+  /* Halo radial sutil detrás del contenido, típico de dashboards SaaS oscuros */
+  background-image: radial-gradient(
+    circle at 15% -10%,
+    rgba(15, 142, 106, 0.12),
+    transparent 45%
+  );
+}
+
+/* Header con efecto vidrio (glassmorphism): translúcido + blur, se mantiene
+   fijo y oscuro en los 3 temas para dar continuidad de marca en toda la app. */
+ion-header {
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+ion-header ion-toolbar {
+  --background: var(--header-glass-bg);
+  --color: var(--color-header-text);
+  --border-width: 0;
+}
+
+ion-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+ion-card {
+  --background: var(--color-surface);
+  --color: var(--color-text);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+ion-card:hover {
+  border-color: var(--color-accent);
+}
+
+ion-button {
+  --border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  transition: opacity 0.15s ease, filter 0.15s ease;
+}
+
+ion-button.button-solid {
+  --background: var(--color-accent);
+  --color: var(--color-accent-ink);
+  --background-activated: var(--color-accent-shade);
+  --background-hover: var(--color-accent-shade);
+  --box-shadow: 0 0 0 1px rgba(15, 142, 106, 0.5), 0 8px 24px var(--color-accent-glow);
+}
+
+ion-button.button-outline {
+  --border-color: var(--color-accent);
+  --color: var(--color-accent);
+  --background-hover: var(--color-accent);
+  --color-hover: var(--color-accent-ink);
+}
+
+ion-item {
+  --background: var(--color-surface);
+  --color: var(--color-text);
+  --border-color: var(--color-border);
+  --highlight-color-focused: var(--color-accent);
+}
+
+ion-badge {
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 4px 10px;
+}
+
+ion-checkbox {
+  --checkbox-background-checked: var(--color-accent);
+  --border-color-checked: var(--color-accent);
+}
+
+ion-toolbar ion-back-button {
+  --color: var(--color-header-text);
+}

@@ -1,0 +1,20 @@
+.route-ops {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.route-ops__list {
+  margin-top: var(--space-4);
+}
+
+.route-ops__amount {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.route-ops__total {
+  text-align: right;
+  margin-top: var(--space-3);
+  font-size: 0.9rem;
+}
