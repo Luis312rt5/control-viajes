@@ -1,7 +1,32 @@
 import { NestFactory } from '@nestjs/core';
+import { Client } from 'pg';
 import { AppModule } from './app.module';
 
+// TypeORM (con synchronize: true) crea las TABLAS solo, pero no crea el
+// ESQUEMA si no existe — y este servicio guarda sus tablas en un esquema
+// propio ("viajes" por defecto, ver app.module.ts) para poder compartir una
+// misma base Postgres con otro proyecto sin choque de nombres. Sin este
+// paso, el primer arranque falla con "schema ... does not exist" y el
+// proceso termina con exit code 1.
+async function ensureSchemaExists() {
+  const schema = process.env.DB_SCHEMA || 'viajes';
+  const databaseUrl = process.env.DATABASE_URL;
+  const client = databaseUrl
+    ? new Client({ connectionString: databaseUrl, ssl: { rejectUnauthorized: false } })
+    : new Client({
+        host: process.env.DB_HOST || 'localhost',
+        port: parseInt(process.env.DB_PORT || '5432', 10),
+        user: process.env.DB_USER || 'postgres',
+        password: process.env.DB_PASSWORD || 'postgres',
+        database: process.env.DB_NAME || 'trips_db',
+      });
+  await client.connect();
+  await client.query(`CREATE SCHEMA IF NOT EXISTS "${schema}"`);
+  await client.end();
+}
+
 async function bootstrap() {
+  await ensureSchemaExists();
   const app = await NestFactory.create(AppModule);
 
   // Nota: no se aplica ValidationPipe aquí a propósito. La validación de
