@@ -11,12 +11,12 @@ validación de pasajeros y reporte de novedades/gastos en ruta.
    (Ionic)          │  Auth + JWT │
                      │  RBAC       │
                      └──────┬──────┘
-                            │ TCP (microservicios)
+                            │ HTTP interno (x-internal-key)
               ┌─────────────┴─────────────┐
               ▼                           ▼
       ┌───────────────┐          ┌──────────────────┐
       │ trips-service │◀────────▶│operations-service │
-      │  (puerto 3001)│   TCP    │   (puerto 3002)    │
+      │  (puerto 3001)│   HTTP   │   (puerto 3002)    │
       │ Users/Trips/  │          │ Expenses/Incidents │
       │  Passengers   │          └──────────────────┘
       └───────┬───────┘                    │
@@ -30,7 +30,7 @@ validación de pasajeros y reporte de novedades/gastos en ruta.
 **Por qué esta arquitectura:**
 - `trips-service` es dueño exclusivo de usuarios, viajes y pasajeros.
 - `operations-service` es dueño exclusivo de gastos y novedades.
-- Antes de aceptar un gasto o novedad, `operations-service` **consulta por TCP**
+- Antes de aceptar un gasto o novedad, `operations-service` **consulta por HTTP**
   a `trips-service` si el viaje está `in_progress`. Si no lo está, rechaza la
   operación. Esto demuestra tanto la comunicación entre microservicios como la
   regla de negocio transaccional pedida en el reto.
@@ -38,6 +38,13 @@ validación de pasajeros y reporte de novedades/gastos en ruta.
   con Guards, reenvía la petición al microservicio correspondiente, y agrega
   datos de ambos servicios cuando se necesita un reporte combinado
   (`GET /trips/:id/report`).
+- **Nota:** originalmente `gateway ⇄ trips-service ⇄ operations-service` se
+  hablaban por TCP puro (`@nestjs/microservices`). Se migró a HTTP (rutas
+  bajo `/internal`, protegidas con el header `x-internal-key`, ver
+  `INTERNAL_API_KEY` en cada `.env.example`) porque el plan Free de Render
+  —destino de despliegue de este proyecto— no permite tráfico de red privada
+  entrante entre servicios, solo tráfico público HTTP(S). Ver `render.yaml`
+  en la raíz del repo para el detalle del despliegue.
 
 ## Requisitos
 

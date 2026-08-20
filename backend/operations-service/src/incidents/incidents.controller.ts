@@ -1,19 +1,19 @@
-import { Controller } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { IncidentsService } from './incidents.service';
 import { CreateIncidentDto } from './dto/create-incident.dto';
 
-@Controller()
+// Rutas internas (llamadas solo por el gateway). Ver nota en main.ts.
+@Controller('incidents')
 export class IncidentsController {
   constructor(private readonly incidentsService: IncidentsService) {}
 
-  @MessagePattern('incidents.create')
-  create(@Payload() dto: CreateIncidentDto) {
+  @Post()
+  create(@Body() dto: CreateIncidentDto) {
     return this.incidentsService.create(dto);
   }
 
-  @MessagePattern('incidents.findByTrip')
-  findByTrip(@Payload() data: { tripId: string }) {
-    return this.incidentsService.findByTrip(data.tripId);
+  @Get('trip/:tripId')
+  findByTrip(@Param('tripId') tripId: string) {
+    return this.incidentsService.findByTrip(tripId);
   }
 }

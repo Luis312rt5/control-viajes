@@ -72,11 +72,23 @@ Abre `http://localhost:5173`. Ingresa con:
 
 ## Despliegue en vivo
 
-- **Backend + BD:** Render, Railway o Fly — cada carpeta de `backend/`
-  (gateway, trips-service, operations-service) se despliega como un servicio
-  Docker independiente, más una instancia de PostgreSQL gestionada.
-- **Frontend:** Vercel o Netlify, apuntando a la carpeta `frontend/` con
-  `VITE_API_URL` configurado hacia la URL pública del gateway desplegado.
+- **Backend + BD:** Render. Usa el Blueprint `render.yaml` de la raíz del
+  repo ("New +" → "Blueprint" en el dashboard de Render, apuntando a este
+  repositorio): crea `gateway`, `trips-service`, `operations-service` (cada
+  uno como Web Service Docker gratuito) y una base de datos PostgreSQL
+  gratuita. Tras el primer deploy hay que completar a mano las URLs públicas
+  de un servicio en las variables de entorno de los otros — el propio
+  `render.yaml` trae las instrucciones paso a paso en sus comentarios.
+- **Frontend:** Vercel, apuntando a la carpeta `frontend/`. Incluye
+  `vercel.json` con el rewrite necesario para el ruteo de React Router.
+  Configura `VITE_API_URL` en las variables de entorno del proyecto de
+  Vercel con la URL pública del `gateway` desplegado en Render + `/api`.
+
+**Nota sobre el plan Free de Render:** los servicios se "duermen" tras 15
+min sin tráfico (la primera petición tras la inactividad puede tardar hasta
+~50s en responder) y la base de datos Postgres gratuita se borra a los 30
+días sin posibilidad de recuperación. Para un despliegue permanente, sube a
+planes pagos (`plan: starter` en `render.yaml` y en la base de datos).
 
 Ver `backend/README.md` para el detalle completo de variables de entorno,
 endpoints y arquitectura de comunicación entre microservicios.

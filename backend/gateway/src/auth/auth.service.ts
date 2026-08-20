@@ -1,24 +1,19 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { firstValueFrom, timeout } from 'rxjs';
+import { TripsServiceClient } from '../clients/trips-service.client';
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject('TRIPS_SERVICE') private readonly tripsClient: ClientProxy,
+    private readonly tripsClient: TripsServiceClient,
     private readonly jwtService: JwtService,
   ) {}
 
   async login(dto: LoginDto) {
-    const user = await firstValueFrom(
-      this.tripsClient
-        .send('users.validateCredentials', {
-          email: dto.email,
-          password: dto.password,
-        })
-        .pipe(timeout(5000)),
+    const user: any = await this.tripsClient.validateCredentials(
+      dto.email,
+      dto.password,
     );
 
     if (!user) {

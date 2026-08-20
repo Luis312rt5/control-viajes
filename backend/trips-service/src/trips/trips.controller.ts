@@ -1,66 +1,60 @@
-import { Controller } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { TripsService } from './trips.service';
-import {
-  CheckInPassengerDto,
-  CloseTripDto,
-  CreateTripDto,
-  PaginationDto,
-  SignTripDto,
-  StartTripDto,
-} from './dto/create-trip.dto';
+import { CreateTripDto, PaginationDto } from './dto/create-trip.dto';
 
-@Controller()
+// Rutas internas (llamadas solo por gateway y operations-service, nunca
+// directamente por el navegador). Antes esto era un microservicio TCP puro;
+// ver nota en main.ts sobre por qué ahora es HTTP protegido con x-internal-key.
+@Controller('trips')
 export class TripsController {
   constructor(private readonly tripsService: TripsService) {}
 
-  @MessagePattern('trips.create')
-  create(@Payload() dto: CreateTripDto) {
+  @Post()
+  create(@Body() dto: CreateTripDto) {
     return this.tripsService.create(dto);
   }
 
-  @MessagePattern('trips.findAll')
-  findAll(@Payload() pagination: PaginationDto) {
+  @Get()
+  findAll(@Query() pagination: PaginationDto) {
     return this.tripsService.findAll(pagination);
   }
 
-  @MessagePattern('trips.findOne')
-  findOne(@Payload() data: { id: string }) {
-    return this.tripsService.findOne(data.id);
+  @Get('driver/:driverId')
+  findByDriver(@Param('driverId') driverId: string) {
+    return this.tripsService.findByDriver(driverId);
   }
 
-  @MessagePattern('trips.findByDriver')
-  findByDriver(@Payload() data: { driverId: string }) {
-    return this.tripsService.findByDriver(data.driverId);
+  @Get(':id/status')
+  getStatus(@Param('id') id: string) {
+    return this.tripsService.getStatus(id);
   }
 
-  @MessagePattern('trips.checkInPassenger')
-  checkIn(@Payload() dto: CheckInPassengerDto) {
-    return this.tripsService.checkInPassenger(
-      dto.tripId,
-      dto.passengerId,
-      dto.boarded,
-    );
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.tripsService.findOne(id);
   }
 
-  @MessagePattern('trips.sign')
-  sign(@Payload() dto: SignTripDto) {
-    return this.tripsService.sign(dto.tripId, dto.signature);
+  @Patch(':id/passengers/:passengerId/checkin')
+  checkIn(
+    @Param('id') id: string,
+    @Param('passengerId') passengerId: string,
+    @Body('boarded') boarded: boolean,
+  ) {
+    return this.tripsService.checkInPassenger(id, passengerId, boarded);
   }
 
-  @MessagePattern('trips.start')
-  start(@Payload() dto: StartTripDto) {
-    return this.tripsService.start(dto.tripId);
+  @Post(':id/sign')
+  sign(@Param('id') id: string, @Body('signature') signature: string) {
+    return this.tripsService.sign(id, signature);
   }
 
-  @MessagePattern('trips.close')
-  close(@Payload() dto: CloseTripDto) {
-    return this.tripsService.close(dto.tripId);
+  @Post(':id/start')
+  start(@Param('id') id: string) {
+    return this.tripsService.start(id);
   }
 
-  // Consultado por operations-service antes de aceptar un gasto/novedad
-  @MessagePattern('trips.getStatus')
-  getStatus(@Payload() data: { tripId: string }) {
-    return this.tripsService.getStatus(data.tripId);
+  @Post(':id/close')
+  close(@Param('id') id: string) {
+    return this.tripsService.close(id);
   }
 }

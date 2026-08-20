@@ -1,36 +1,16 @@
 import { Module } from '@nestjs/common';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
+import { TripsServiceClient } from './clients/trips-service.client';
+import { OperationsServiceClient } from './clients/operations-service.client';
 
+// Nota: el nombre del archivo/módulo se conserva para minimizar cambios en
+// los módulos que lo importan, pero ya no registra clientes TCP de
+// @nestjs/microservices — ahora provee clientes HTTP hacia trips-service y
+// operations-service (ver src/clients/). Motivo: Render Free no permite
+// tráfico de red privada entrante entre servicios.
 @Module({
-  imports: [
-    ClientsModule.registerAsync([
-      {
-        name: 'TRIPS_SERVICE',
-        imports: [ConfigModule],
-        inject: [ConfigService],
-        useFactory: (config: ConfigService) => ({
-          transport: Transport.TCP,
-          options: {
-            host: config.get('TRIPS_SERVICE_HOST', 'trips-service'),
-            port: parseInt(config.get('TRIPS_SERVICE_PORT', '3001'), 10),
-          },
-        }),
-      },
-      {
-        name: 'OPERATIONS_SERVICE',
-        imports: [ConfigModule],
-        inject: [ConfigService],
-        useFactory: (config: ConfigService) => ({
-          transport: Transport.TCP,
-          options: {
-            host: config.get('OPERATIONS_SERVICE_HOST', 'operations-service'),
-            port: parseInt(config.get('OPERATIONS_SERVICE_PORT', '3002'), 10),
-          },
-        }),
-      },
-    ]),
-  ],
-  exports: [ClientsModule],
+  imports: [ConfigModule],
+  providers: [TripsServiceClient, OperationsServiceClient],
+  exports: [TripsServiceClient, OperationsServiceClient],
 })
 export class MicroservicesClientsModule {}

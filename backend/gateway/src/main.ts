@@ -23,10 +23,15 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
+  // Sin prefijo /api, para el health check de Render (ver render.yaml).
+  app.getHttpAdapter().get('/health', (_req, res) =>
+    res.status(200).json({ status: 'ok', service: 'gateway' }),
+  );
+
   app.setGlobalPrefix('api');
 
-  const port = process.env.PORT || 3000;
-  await app.listen(port);
+  const port = parseInt(process.env.PORT || '3000', 10);
+  await app.listen(port, '0.0.0.0');
   console.log(`Gateway escuchando en http://localhost:${port}/api`);
 }
 bootstrap();

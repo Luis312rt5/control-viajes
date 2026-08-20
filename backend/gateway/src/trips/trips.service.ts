@@ -1,71 +1,56 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom, timeout } from 'rxjs';
+import { Injectable } from '@nestjs/common';
+import { TripsServiceClient } from '../clients/trips-service.client';
+import { OperationsServiceClient } from '../clients/operations-service.client';
 import { CreateTripDto, PaginationQueryDto } from './dto/trips.dto';
 
 @Injectable()
 export class TripsService {
   constructor(
-    @Inject('TRIPS_SERVICE') private readonly tripsClient: ClientProxy,
-    @Inject('OPERATIONS_SERVICE')
-    private readonly operationsClient: ClientProxy,
+    private readonly tripsClient: TripsServiceClient,
+    private readonly operationsClient: OperationsServiceClient,
   ) {}
-
-  private send<T>(client: ClientProxy, pattern: string, data: any) {
-    return firstValueFrom(client.send<T>(pattern, data).pipe(timeout(5000)));
-  }
 
   create(dto: CreateTripDto, driverId: string) {
     // El admin puede especificar el driverId directamente en el DTO
-    return this.send(this.tripsClient, 'trips.create', dto);
+    return this.tripsClient.createTrip(dto);
   }
 
   findAll(pagination: PaginationQueryDto) {
-    return this.send(this.tripsClient, 'trips.findAll', pagination);
+    return this.tripsClient.findAllTrips(pagination);
   }
 
   findOne(id: string) {
-    return this.send(this.tripsClient, 'trips.findOne', { id });
+    return this.tripsClient.findOneTrip(id);
   }
 
   findByDriver(driverId: string) {
-    return this.send(this.tripsClient, 'trips.findByDriver', { driverId });
+    return this.tripsClient.findTripsByDriver(driverId);
   }
 
   checkInPassenger(tripId: string, passengerId: string, boarded: boolean) {
-    return this.send(this.tripsClient, 'trips.checkInPassenger', {
-      tripId,
-      passengerId,
-      boarded,
-    });
+    return this.tripsClient.checkInPassenger(tripId, passengerId, boarded);
   }
 
   sign(tripId: string, signature: string) {
-    return this.send(this.tripsClient, 'trips.sign', { tripId, signature });
+    return this.tripsClient.signTrip(tripId, signature);
   }
 
   start(tripId: string) {
-    return this.send(this.tripsClient, 'trips.start', { tripId });
+    return this.tripsClient.startTrip(tripId);
   }
 
   async close(tripId: string) {
-    await this.send(this.tripsClient, 'trips.close', { tripId });
+    await this.tripsClient.closeTrip(tripId);
     return this.buildReport(tripId);
   }
 
   /** Agrega datos de trips-service + operations-service en un solo reporte */
   async buildReport(tripId: string) {
     const [trip, expenses, incidents, totalExpenses] = await Promise.all([
-      this.send<any>(this.tripsClient, 'trips.findOne', { id: tripId }),
-      this.send<any[]>(this.operationsClient, 'expenses.findByTrip', {
-        tripId,
-      }),
-      this.send<any[]>(this.operationsClient, 'incidents.findByTrip', {
-        tripId,
-      }),
-      this.send<number>(this.operationsClient, 'expenses.totalByTrip', {
-        tripId,
-      }),
+      this.tripsClient.findOneTrip(tripId) as Promise<any>,
+      this.operationsClient.findExpensesByTrip(tripId) as Promise<any[]>,
+      this.operationsClient.findIncidentsByTrip(tripId),
+      this.operationsClient.totalExpensesByTrip(tripId),
     ]);
 
     const totalPassengers = trip.passengers?.length || 0;

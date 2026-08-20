@@ -1,28 +1,29 @@
-import { Controller } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
 
-@Controller()
+@Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @MessagePattern('users.validateCredentials')
+  @Post('validate-credentials')
   async validateCredentials(
-    @Payload() data: { email: string; password: string },
+    @Body() body: { email: string; password: string },
   ) {
-    return this.usersService.validateCredentials(data.email, data.password);
+    return this.usersService.validateCredentials(body.email, body.password);
   }
 
-  @MessagePattern('users.findById')
-  async findById(@Payload() data: { id: string }) {
-    const user = await this.usersService.findById(data.id);
+  // Nota de orden de rutas: 'drivers' y 'validate-credentials' deben quedar
+  // declaradas antes de ':id' para que no sean interpretadas como un id.
+  @Get('drivers')
+  async findDrivers() {
+    return this.usersService.findDrivers();
+  }
+
+  @Get(':id')
+  async findById(@Param('id') id: string) {
+    const user = await this.usersService.findById(id);
     if (!user) return null;
     const { password: _pw, ...safe } = user;
     return safe;
-  }
-
-  @MessagePattern('users.findDrivers')
-  async findDrivers() {
-    return this.usersService.findDrivers();
   }
 }

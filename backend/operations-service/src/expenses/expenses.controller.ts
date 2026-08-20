@@ -1,24 +1,24 @@
-import { Controller } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 
-@Controller()
+// Rutas internas (llamadas solo por el gateway). Ver nota en main.ts.
+@Controller('expenses')
 export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
 
-  @MessagePattern('expenses.create')
-  create(@Payload() dto: CreateExpenseDto) {
+  @Post()
+  create(@Body() dto: CreateExpenseDto) {
     return this.expensesService.create(dto);
   }
 
-  @MessagePattern('expenses.findByTrip')
-  findByTrip(@Payload() data: { tripId: string }) {
-    return this.expensesService.findByTrip(data.tripId);
+  @Get('trip/:tripId/total')
+  totalByTrip(@Param('tripId') tripId: string) {
+    return this.expensesService.totalByTrip(tripId);
   }
 
-  @MessagePattern('expenses.totalByTrip')
-  totalByTrip(@Payload() data: { tripId: string }) {
-    return this.expensesService.totalByTrip(data.tripId);
+  @Get('trip/:tripId')
+  findByTrip(@Param('tripId') tripId: string) {
+    return this.expensesService.findByTrip(tripId);
   }
 }

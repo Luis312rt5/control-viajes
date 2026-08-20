@@ -31,6 +31,7 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres
       DB_NAME: trips_db
+      INTERNAL_API_KEY: dev_internal_key_change_me
     depends_on:
       postgres:
         condition: service_healthy
@@ -48,8 +49,11 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres
       DB_NAME: operations_db
-      TRIPS_SERVICE_HOST: trips-service
-      TRIPS_SERVICE_PORT: 3001
+      # Comunicación entre microservicios ahora es HTTP (ver notas en
+      # main.ts de cada servicio) porque Render Free, el destino de
+      # despliegue, no permite TCP puro entre servicios privados.
+      TRIPS_SERVICE_URL: http://trips-service:3001/internal
+      INTERNAL_API_KEY: dev_internal_key_change_me
     depends_on:
       postgres:
         condition: service_healthy
@@ -65,10 +69,9 @@ services:
     environment:
       PORT: 3000
       JWT_SECRET: super_secret_key_change_in_production
-      TRIPS_SERVICE_HOST: trips-service
-      TRIPS_SERVICE_PORT: 3001
-      OPERATIONS_SERVICE_HOST: operations-service
-      OPERATIONS_SERVICE_PORT: 3002
+      TRIPS_SERVICE_URL: http://trips-service:3001/internal
+      OPERATIONS_SERVICE_URL: http://operations-service:3002/internal
+      INTERNAL_API_KEY: dev_internal_key_change_me
     depends_on:
       - trips-service
       - operations-service

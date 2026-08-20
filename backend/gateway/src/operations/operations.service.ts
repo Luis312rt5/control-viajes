@@ -1,34 +1,24 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom, timeout } from 'rxjs';
+import { Injectable } from '@nestjs/common';
+import { OperationsServiceClient } from '../clients/operations-service.client';
 import { CreateExpenseDto, CreateIncidentDto } from './dto/operations.dto';
 
 @Injectable()
 export class OperationsService {
-  constructor(
-    @Inject('OPERATIONS_SERVICE')
-    private readonly operationsClient: ClientProxy,
-  ) {}
-
-  private send<T>(pattern: string, data: any) {
-    return firstValueFrom(
-      this.operationsClient.send<T>(pattern, data).pipe(timeout(5000)),
-    );
-  }
+  constructor(private readonly operationsClient: OperationsServiceClient) {}
 
   createExpense(dto: CreateExpenseDto) {
-    return this.send('expenses.create', dto);
+    return this.operationsClient.createExpense(dto);
   }
 
   findExpensesByTrip(tripId: string) {
-    return this.send('expenses.findByTrip', { tripId });
+    return this.operationsClient.findExpensesByTrip(tripId);
   }
 
   createIncident(dto: CreateIncidentDto) {
-    return this.send('incidents.create', dto);
+    return this.operationsClient.createIncident(dto);
   }
 
   findIncidentsByTrip(tripId: string) {
-    return this.send('incidents.findByTrip', { tripId });
+    return this.operationsClient.findIncidentsByTrip(tripId);
   }
 }
