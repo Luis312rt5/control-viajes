@@ -21,11 +21,12 @@
  * la primera respuesta que llega no es la de la app (es una página HTML de
  * espera de la infraestructura), así que el body no es JSON válido. Antes
  * eso tiraba un SyntaxError sin manejar que terminaba como 500 genérico sin
- * explicación. Ahora, si el body no parsea como JSON, se espera un poco y
- * se reintenta una vez (tiempo típico de arranque en frío) antes de
- * reportar el error.
+ * explicación. Ahora, si el body no parsea como JSON, se reintenta varias
+ * veces con espera creciente (hasta ~35s en total) antes de reportar el
+ * error — un solo reintento de 4s no alcanzaba para un arranque en frío
+ * real, que puede tardar hasta ~50s.
  */
-const COLD_START_RETRY_DELAY_MS = 4000;
+const COLD_START_RETRY_DELAYS_MS = [4000, 8000, 12000];
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -89,10 +90,15 @@ export class InternalHttpClient {
     let result = await this.fetchOnce(method, path, body);
     let data = result.rawText ? tryParseJson(result.rawText) : null;
 
-    if (result.rawText && data === undefined) {
+    for (
+      let attempt = 0;
+      result.rawText && data === undefined && attempt < COLD_START_RETRY_DELAYS_MS.length;
+      attempt++
+    ) {
       // Probable arranque en frío: lo que llegó no fue JSON. Se reintenta
-      // una vez, dándole tiempo al servicio a terminar de arrancar.
-      await delay(COLD_START_RETRY_DELAY_MS);
+      // con espera creciente, dándole tiempo al servicio a terminar de
+      // arrancar.
+      await delay(COLD_START_RETRY_DELAYS_MS[attempt]);
       result = await this.fetchOnce(method, path, body);
       data = result.rawText ? tryParseJson(result.rawText) : null;
     }
