@@ -1,38 +1,38 @@
-# Blueprint de Render para desplegar los 3 servicios del backend + Postgres
+# Blueprint de Render para desplegar los 3 servicios del backend
 # de un solo golpe ("New +" -> "Blueprint" en el dashboard de Render,
 # apuntando a este repositorio).
+#
+# BASE DE DATOS: este blueprint YA NO crea una base Postgres nueva (el plan
+# free de Render solo permite una base activa por cuenta). En cambio,
+# trips-service y operations-service reciben la conexión vía la variable
+# DATABASE_URL, que hay que completar a mano con la "Internal Database URL"
+# de tu base Postgres existente en Render (dashboard -> tu base -> "Connect"
+# -> "Internal Database URL"; usa la interna, no la externa, para que el
+# tráfico no salga a internet). Ambos servicios crean sus tablas dentro del
+# esquema "viajes" (no "public"), así que pueden compartir esa base con
+# cualquier otro proyecto sin choque de nombres de tabla — no hace falta
+# revisar qué tablas tiene el otro proyecto.
 #
 # IMPORTANTE — pasos manuales después del primer deploy (Render todavía no
 # asigna las URLs públicas antes de crear los servicios, así que no se
 # pueden auto-cablear de antemano):
-#   1. Copia la URL pública que Render asignó a "trips-service"
+#   1. En "trips-service" y "operations-service", pestaña "Environment",
+#      completa DATABASE_URL con la Internal Database URL de tu Postgres.
+#   2. Copia la URL pública que Render asignó a "trips-service"
 #      (algo como https://trips-service-xxxx.onrender.com) y pégala, con
 #      /internal al final, como valor de TRIPS_SERVICE_URL en las variables
 #      de entorno de "operations-service" y de "gateway".
-#   2. Copia la URL pública de "operations-service" + /internal como valor
+#   3. Copia la URL pública de "operations-service" + /internal como valor
 #      de OPERATIONS_SERVICE_URL en "gateway".
-#   3. Copia la URL pública de "gateway" + /api como valor de VITE_API_URL
+#   4. Copia la URL pública de "gateway" + /api como valor de VITE_API_URL
 #      en el proyecto de Vercel del frontend (ver frontend/.env.example).
-#   4. En cada uno de los 3 servicios, en la pestaña "Settings" -> "Health
+#   5. En cada uno de los 3 servicios, en la pestaña "Settings" -> "Health
 #      Checks", confirma que el Health Check Path sea /health (ya viene
 #      seteado por este blueprint).
 #
 # Nota sobre el plan Free: los servicios se "duermen" tras 15 min sin
-# tráfico y el Postgres free se borra a los 30 días (ver README). Para un
-# despliegue permanente/productivo, cambia `plan: free` por `plan: starter`
-# en los 3 servicios y en la base de datos.
-
-databases:
-  - name: viajes-db
-    plan: free
-    databaseName: viajes
-    user: viajes
-    # trips-service y operations-service comparten esta misma base de datos
-    # (cada uno crea sus propias tablas vía TypeORM synchronize: true; no
-    # hay colisión de nombres). En el docker-compose local sí quedan en dos
-    # bases separadas (trips_db/operations_db) sobre el mismo Postgres — acá
-    # se simplifica a una sola base para no necesitar dos instancias de
-    # Postgres pagas.
+# tráfico (ver README). Para un despliegue permanente/productivo, cambia
+# `plan: free` por `plan: starter` en los 3 servicios.
 
 services:
   - type: web
@@ -45,26 +45,10 @@ services:
     envVars:
       - key: PORT
         value: 3001
-      - key: DB_HOST
-        fromDatabase:
-          name: viajes-db
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: viajes-db
-          property: port
-      - key: DB_USER
-        fromDatabase:
-          name: viajes-db
-          property: user
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: viajes-db
-          property: password
-      - key: DB_NAME
-        fromDatabase:
-          name: viajes-db
-          property: database
+      - key: DATABASE_URL
+        sync: false # pega aquí la Internal Database URL de tu Postgres, ver instrucciones arriba
+      - key: DB_SCHEMA
+        value: viajes
       - key: INTERNAL_API_KEY
         generateValue: true
 
@@ -78,26 +62,10 @@ services:
     envVars:
       - key: PORT
         value: 3002
-      - key: DB_HOST
-        fromDatabase:
-          name: viajes-db
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: viajes-db
-          property: port
-      - key: DB_USER
-        fromDatabase:
-          name: viajes-db
-          property: user
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: viajes-db
-          property: password
-      - key: DB_NAME
-        fromDatabase:
-          name: viajes-db
-          property: database
+      - key: DATABASE_URL
+        sync: false # pega aquí la Internal Database URL de tu Postgres, ver instrucciones arriba
+      - key: DB_SCHEMA
+        value: viajes
       - key: INTERNAL_API_KEY
         fromService:
           type: web
