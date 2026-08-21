@@ -72,3 +72,68 @@
   margin-top: var(--space-4);
   justify-content: center;
 }
+
+/* ============ Ajuste para celulares ============ */
+/* La tabla con columnas fijas no cabe en una pantalla angosta (obliga a
+   hacer scroll horizontal, algo incómodo en un teléfono). Por debajo de
+   700px la convertimos en una lista de "tarjetas": cada <tr> pasa a ser
+   un bloque propio y cada <td> muestra su etiqueta (vía data-label +
+   ::before) en vez de depender del <thead>, que se oculta. */
+@media (max-width: 700px) {
+  .admin-dashboard__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-dashboard__toolbar > ion-button {
+    width: 100%;
+  }
+
+  .admin-table {
+    border: none;
+    background: none;
+    display: block;
+  }
+
+  .admin-table thead {
+    display: none;
+  }
+
+  .admin-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .admin-table__row {
+    display: block;
+    background: var(--color-surface);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .admin-table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+    border-top: var(--border-width) solid var(--color-border);
+    text-align: right;
+  }
+
+  .admin-table td:first-child {
+    border-top: none;
+  }
+
+  .admin-table td::before {
+    content: attr(data-label);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    text-align: left;
+  }
+}

@@ -59,11 +59,29 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  // El tema personalizado se aplica escribiendo estilos EN LÍNEA sobre <html>
+  // (root.style.setProperty). Un estilo en línea siempre gana por encima de
+  // cualquier regla de la hoja de estilos, sin importar su especificidad —
+  // incluida la regla ":root[data-theme='light']" / "[data-theme='dark']".
+  // Por eso, al salir del modo personalizado, no basta con cambiar el
+  // atributo "data-theme": si no se limpian esos estilos en línea, los
+  // colores personalizados quedan "pegados" para siempre y el usuario ve
+  // que claro/oscuro no cambian nada. clearCustomColors() los remueve para
+  // que las reglas normales de light/dark vuelvan a tomar el control.
+  const clearCustomColors = useCallback(() => {
+    const root = document.documentElement;
+    (Object.keys(CUSTOM_VARS_MAP) as (keyof CustomThemeColors)[]).forEach((key) => {
+      root.style.removeProperty(CUSTOM_VARS_MAP[key]);
+    });
+  }, []);
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', mode);
     localStorage.setItem('themeMode', mode);
     if (mode === 'custom') {
       applyCustomColors(customColors);
+    } else {
+      clearCustomColors();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);

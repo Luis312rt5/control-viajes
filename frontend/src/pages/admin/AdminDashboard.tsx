@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   IonContent,
@@ -10,7 +10,6 @@ import {
   IonButton,
   IonIcon,
   IonSpinner,
-  useIonViewWillEnter,
 } from '@ionic/react';
 import { logOutOutline, addOutline } from 'ionicons/icons';
 import { useAuth } from '../../contexts/AuthContext';
@@ -35,13 +34,9 @@ export function AdminDashboard() {
     setLoading(false);
   };
 
-  // Igual que en DriverHome: Ionic no desmonta esta página al volver del
-  // detalle de un viaje, así que hacía falta el hook de ciclo de vida de
-  // Ionic (en vez de un useEffect de solo montaje) para que el estado se
-  // refresque cada vez que volvés a este panel.
-  useIonViewWillEnter(() => {
-    load(meta.page);
-  });
+  useEffect(() => {
+    load();
+  }, []);
 
   return (
     <IonPage>
@@ -90,15 +85,15 @@ export function AdminDashboard() {
                   onClick={() => history.push(`/admin/trips/${trip.id}`)}
                   className="admin-table__row"
                 >
-                  <td className="admin-table__code">{trip.code}</td>
-                  <td>
+                  <td className="admin-table__code" data-label="Código">{trip.code}</td>
+                  <td data-label="Ruta">
                     {trip.origin} → {trip.destination}
                   </td>
-                  <td>{trip.driver?.fullName}</td>
-                  <td>
+                  <td data-label="Conductor">{trip.driver?.fullName}</td>
+                  <td data-label="Pasajeros">
                     {trip.passengers.filter((p) => p.boarded).length}/{trip.passengers.length}
                   </td>
-                  <td>
+                  <td data-label="Estado">
                     <StatusBadge status={trip.status} />
                   </td>
                 </tr>
