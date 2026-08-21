@@ -16,6 +16,37 @@ const CUSTOM_VARS_MAP: Record<keyof CustomThemeColors, string> = {
   accent: '--color-accent',
 };
 
+// Variables que el modo personalizado calcula además de las 4 que elige el
+// usuario. El resto de derivados (bordes, texto secundario, sombras del
+// acento) los resuelve la hoja de estilos con color-mix; estos dos no pueden
+// expresarse en CSS porque dependen de la luminancia del acento.
+const DERIVED_VARS = ['--color-accent-ink', '--ion-color-primary-rgb'];
+
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const clean = hex.replace('#', '').trim();
+  const full = clean.length === 3 ? clean.replace(/./g, (c) => c + c) : clean;
+  if (!/^[0-9a-fA-F]{6}$/.test(full)) return null;
+  const n = parseInt(full, 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+
+function relativeLuminance({ r, g, b }: { r: number; g: number; b: number }): number {
+  const [rr, gg, bb] = [r, g, b].map((channel) => {
+    const s = channel / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * rr + 0.7152 * gg + 0.0722 * bb;
+}
+
+// Un acento claro (por ejemplo el ámbar por defecto) con texto blanco encima
+// queda ilegible; sobre acentos oscuros pasa lo contrario. Elegimos la tinta
+// del botón según qué tan luminoso sea el acento que eligió el usuario.
+function inkForAccent(accent: string): string {
+  const rgb = hexToRgb(accent);
+  if (!rgb) return '#F5FBF9';
+  return relativeLuminance(rgb) > 0.5 ? '#14161B' : '#F5FBF9';
+}
+
 const DEFAULT_CUSTOM_COLORS: CustomThemeColors = {
   bg: '#14161B',
   surface: '#1D2027',
@@ -57,6 +88,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     (Object.keys(colors) as (keyof CustomThemeColors)[]).forEach((key) => {
       root.style.setProperty(CUSTOM_VARS_MAP[key], colors[key]);
     });
+    root.style.setProperty('--color-accent-ink', inkForAccent(colors.accent));
+    const accentRgb = hexToRgb(colors.accent);
+    if (accentRgb) {
+      root.style.setProperty(
+        '--ion-color-primary-rgb',
+        `${accentRgb.r}, ${accentRgb.g}, ${accentRgb.b}`,
+      );
+    }
   }, []);
 
   // El tema personalizado se aplica escribiendo estilos EN LÍNEA sobre <html>
@@ -73,6 +112,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     (Object.keys(CUSTOM_VARS_MAP) as (keyof CustomThemeColors)[]).forEach((key) => {
       root.style.removeProperty(CUSTOM_VARS_MAP[key]);
     });
+    DERIVED_VARS.forEach((cssVar) => root.style.removeProperty(cssVar));
   }, []);
 
   useEffect(() => {

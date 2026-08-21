@@ -8,18 +8,13 @@ import {
   IonTitle,
   IonButtons,
   IonBackButton,
-  IonList,
-  IonItem,
-  IonLabel,
   IonCheckbox,
-  IonButton,
+  IonIcon,
   IonSpinner,
-  IonText,
   IonToast,
-  IonCard,
-  IonCardContent,
   useIonViewWillEnter,
 } from '@ionic/react';
+import { checkmarkCircle } from 'ionicons/icons';
 import { fetchTrip, checkInPassenger, signTrip, startTrip, closeTrip } from '../../api/trips';
 import { Trip } from '../../api/types';
 import { extractErrorMessage } from '../../api/client';
@@ -102,8 +97,10 @@ export function DriverTripDetail() {
   if (loading || !trip) {
     return (
       <IonPage>
-        <IonContent className="ion-padding">
-          <IonSpinner name="dots" />
+        <IonContent>
+          <div className="ui-loading">
+            <IonSpinner name="dots" />
+          </div>
         </IonContent>
       </IonPage>
     );
@@ -123,83 +120,84 @@ export function DriverTripDetail() {
           <IonTitle>{trip.code}</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
-        <div className="trip-detail__header">
-          <div>
-            <h2>
-              {trip.origin} → {trip.destination}
-            </h2>
+      <IonContent>
+        <div className="page-shell page-shell--narrow trip-detail">
+          <div className="ui-page-head">
+            <div>
+              <h2>
+                {trip.origin} → {trip.destination}
+              </h2>
+              <p>
+                {trip.passengers.filter((p) => p.boarded).length} de {trip.passengers.length}{' '}
+                pasajeros abordados
+              </p>
+            </div>
+            <StatusBadge status={trip.status} />
           </div>
-          <StatusBadge status={trip.status} />
-        </div>
 
-        {!isInProgress && !isClosed && (
-          <>
-            <IonCard>
-              <IonCardContent>
-                <p className="trip-detail__section-title">
-                  Lista de pasajeros ({trip.passengers.filter((p) => p.boarded).length}/
-                  {trip.passengers.length} abordados)
-                </p>
-                <IonList>
-                  {trip.passengers.map((p) => (
-                    <IonItem key={p.id} lines="full">
-                      <IonCheckbox
-                        slot="start"
-                        checked={p.boarded}
-                        onIonChange={(e) => handleCheckIn(p.id, e.detail.checked)}
-                      />
-                      <IonLabel>
-                        <h3>{p.name}</h3>
-                        <p>{p.document}</p>
-                      </IonLabel>
-                    </IonItem>
-                  ))}
-                </IonList>
-              </IonCardContent>
-            </IonCard>
+          {!isInProgress && !isClosed && (
+            <>
+              <section className="ui-section">
+                <p className="ui-eyebrow">Lista de pasajeros</p>
+                {trip.passengers.map((p) => (
+                  <div key={p.id} className="ui-row">
+                    <IonCheckbox
+                      className="trip-detail__passenger"
+                      labelPlacement="end"
+                      justify="start"
+                      checked={p.boarded}
+                      onIonChange={(e) => handleCheckIn(p.id, e.detail.checked)}
+                    >
+                      <span className="ui-row__title">{p.name}</span>
+                      <span className="ui-row__sub">{p.document}</span>
+                    </IonCheckbox>
+                  </div>
+                ))}
+              </section>
 
-            <IonCard>
-              <IonCardContent>
+              <section className="ui-section">
                 {trip.signature ? (
-                  <IonText color="success">
-                    <p>✓ Firma capturada. El viaje puede iniciar.</p>
-                  </IonText>
+                  <p className="trip-detail__signed">
+                    <IonIcon icon={checkmarkCircle} />
+                    Firma capturada. El viaje puede iniciar.
+                  </p>
                 ) : (
                   <SignaturePad onConfirm={handleSign} disabled={busy} />
                 )}
-              </IonCardContent>
-            </IonCard>
+              </section>
 
-            <IonButton
-              expand="block"
-              disabled={!canStart || busy}
-              onClick={handleStart}
-              className="trip-detail__start-btn"
+              <div>
+                <button
+                  type="button"
+                  className="ui-button ui-button--block"
+                  disabled={!canStart || busy}
+                  onClick={handleStart}
+                >
+                  {busy ? <IonSpinner name="dots" /> : 'Iniciar viaje'}
+                </button>
+                {!trip.signature && (
+                  <p className="trip-detail__lock-note">
+                    El botón de arranque permanece bloqueado hasta capturar la firma digital.
+                  </p>
+                )}
+              </div>
+            </>
+          )}
+
+          {isInProgress && (
+            <RouteOperations tripId={trip.id} onClose={handleClose} busy={busy} />
+          )}
+
+          {isClosed && (
+            <button
+              type="button"
+              className="ui-button ui-button--block ui-button--ghost"
+              onClick={() => history.push(`/driver/trips/${trip.id}/summary`)}
             >
-              {busy ? <IonSpinner name="dots" /> : 'Iniciar viaje'}
-            </IonButton>
-            {!trip.signature && (
-              <p className="trip-detail__lock-note">
-                El botón de arranque permanece bloqueado hasta capturar la firma digital.
-              </p>
-            )}
-          </>
-        )}
-
-        {isInProgress && (
-          <RouteOperations tripId={trip.id} onClose={handleClose} busy={busy} />
-        )}
-
-        {isClosed && (
-          <IonButton
-            expand="block"
-            fill="outline"
-            onClick={() => history.push(`/driver/trips/${trip.id}/summary`)}
-          >
-            Ver resumen del viaje
-          </IonButton>
-        )}
+              Ver resumen del viaje
+            </button>
+          )}
+        </div>
 
         <IonToast
           isOpen={!!toastMsg}

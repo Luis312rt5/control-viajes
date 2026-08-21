@@ -1,34 +1,96 @@
-.custom-theme-panel {
-  padding: var(--space-4);
+.theme-popover {
+  --width: 260px;
+  --background: var(--color-surface);
+  --box-shadow: var(--shadow-pop);
+  --border-radius: var(--radius-md);
+  --backdrop-opacity: 0.2;
+}
+
+.theme-panel {
+  padding: var(--space-3) var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+.theme-panel__title {
+  margin-bottom: var(--space-3);
+}
+
+.theme-panel__options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.theme-panel__option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 10px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.theme-panel__option ion-icon {
+  font-size: 1.125rem;
+  flex-shrink: 0;
+}
+
+.theme-panel__option:hover {
+  background: var(--color-surface-alt);
+}
+
+.theme-panel__option--active {
+  background: var(--color-surface-alt);
+  color: var(--color-accent);
+}
+
+.theme-panel__colors {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
   border-top: var(--border-width) solid var(--color-border);
 }
 
-.custom-theme-title {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-text-muted);
-  margin: 0 0 var(--space-1) 0;
-}
-
-.custom-theme-panel label {
+.theme-panel__colors label {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 0.9rem;
   gap: var(--space-3);
+  font-size: 0.8125rem;
+  color: var(--color-text);
 }
 
-.custom-theme-panel input[type='color'] {
-  width: 36px;
-  height: 28px;
+.theme-panel__colors input[type='color'] {
+  width: 34px;
+  height: 26px;
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: 0;
   background: none;
   cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.theme-panel__colors input[type='color']::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.theme-panel__colors input[type='color']::-webkit-color-swatch {
+  border: none;
+  border-radius: 6px;
 }

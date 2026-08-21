@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { IonItem, IonLabel, IonInput } from '@ionic/react';
 import { CITIES } from '../data/cities';
 import './CityAutocomplete.css';
 
@@ -38,18 +37,21 @@ export function CityAutocomplete({ label, value, onChange, placeholder }: CityAu
 
   return (
     <div className="city-autocomplete" ref={containerRef}>
-      <IonItem>
-        <IonLabel position="stacked">{label}</IonLabel>
-        <IonInput
+      <label className="ui-field">
+        <span className="ui-field__label">{label}</span>
+        <input
+          className="ui-input"
+          type="text"
+          autoComplete="off"
           value={value}
           placeholder={placeholder}
-          onIonFocus={() => setOpen(true)}
-          onIonInput={(e) => {
-            onChange(e.detail.value || '');
+          onFocus={() => setOpen(true)}
+          onChange={(e) => {
+            onChange(e.target.value);
             setOpen(true);
           }}
         />
-      </IonItem>
+      </label>
 
       {open && filtered.length > 0 && (
         <div className="city-autocomplete__dropdown">

@@ -9,22 +9,19 @@ import {
   IonButtons,
   IonButton,
   IonIcon,
-  IonList,
-  IonItem,
-  IonLabel,
-  IonBadge,
   IonSpinner,
   IonRefresher,
   IonRefresherContent,
   RefresherEventDetail,
   useIonViewWillEnter,
 } from '@ionic/react';
-import { logOutOutline, busOutline, qrCodeOutline } from 'ionicons/icons';
+import { logOutOutline, busOutline, qrCodeOutline, chevronForward } from 'ionicons/icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchMyTrips } from '../../api/trips';
 import { Trip } from '../../api/types';
 import { ThemeSwitcher } from '../../components/ThemeSwitcher';
 import { StatusBadge } from '../../components/StatusBadge';
+import { AppTabs } from '../../components/AppTabs';
 import './DriverHome.css';
 
 export function DriverHome() {
@@ -61,55 +58,62 @@ export function DriverHome() {
         <IonToolbar>
           <IonTitle>Mis viajes</IonTitle>
           <IonButtons slot="end">
-            <IonButton onClick={() => history.push('/driver/scan')}>
+            <IonButton onClick={() => history.push('/driver/scan')} aria-label="Escanear QR">
               <IonIcon icon={qrCodeOutline} slot="icon-only" />
             </IonButton>
             <ThemeSwitcher />
-            <IonButton onClick={logout}>
+            <IonButton onClick={logout} aria-label="Cerrar sesión">
               <IonIcon icon={logOutOutline} slot="icon-only" />
             </IonButton>
           </IonButtons>
         </IonToolbar>
+        <AppTabs placement="top" />
       </IonHeader>
+
       <IonContent>
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent />
         </IonRefresher>
 
-        <div className="driver-home__greeting">
-          <p>Hola, {user?.fullName?.split(' ')[0]}</p>
-        </div>
+        <div className="page-shell">
+          <p className="driver-home__greeting">Hola, {user?.fullName?.split(' ')[0]}</p>
 
-        {loading ? (
-          <div className="driver-home__loading">
-            <IonSpinner name="dots" />
-          </div>
-        ) : trips.length === 0 ? (
-          <div className="driver-home__empty">
-            <IonIcon icon={busOutline} />
-            <p>Todavía no tienes viajes asignados.</p>
-          </div>
-        ) : (
-          <IonList>
-            {trips.map((trip) => (
-              <IonItem
-                key={trip.id}
-                button
-                detail
-                onClick={() => history.push(`/driver/trips/${trip.id}`)}
-              >
-                <IonLabel>
-                  <h2>{trip.code}</h2>
-                  <p>
-                    {trip.origin} → {trip.destination}
-                  </p>
-                </IonLabel>
-                <StatusBadge status={trip.status} slot="end" />
-              </IonItem>
-            ))}
-          </IonList>
-        )}
+          {loading ? (
+            <div className="driver-home__state">
+              <IonSpinner name="dots" />
+            </div>
+          ) : trips.length === 0 ? (
+            <div className="driver-home__state">
+              <IonIcon icon={busOutline} />
+              <p>Todavía no tienes viajes asignados.</p>
+            </div>
+          ) : (
+            <div className="ui-card trip-list">
+              {trips.map((trip) => (
+                <button
+                  key={trip.id}
+                  type="button"
+                  className="trip-list__row"
+                  onClick={() => history.push(`/driver/trips/${trip.id}`)}
+                >
+                  <span className="trip-list__info">
+                    <span className="trip-list__code">{trip.code}</span>
+                    <span className="trip-list__route">
+                      {trip.origin} → {trip.destination}
+                    </span>
+                  </span>
+                  <span className="trip-list__meta">
+                    <StatusBadge status={trip.status} />
+                    <IonIcon icon={chevronForward} />
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </IonContent>
+
+      <AppTabs placement="bottom" />
     </IonPage>
   );
 }

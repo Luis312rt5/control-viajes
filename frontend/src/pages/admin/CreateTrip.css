@@ -1,40 +1,67 @@
 .create-trip-form {
-  max-width: 640px;
-  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
 }
 
 .create-trip-form__row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3);
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+/* flex-basis 220px: en escritorio las dos ciudades caben lado a lado y en
+   celular la segunda baja sola, sin necesidad de otra media query. */
+.create-trip-form__row > * {
+  flex: 1 1 220px;
 }
 
 .create-trip-form__passengers-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: var(--space-5) 0 var(--space-2) 0;
-}
-
-.create-trip-form__passengers-header p {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-text-muted);
-  margin: 0;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
 }
 
 .create-trip-form__passenger-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr auto;
-  gap: var(--space-2);
+  display: flex;
   align-items: center;
-  margin-bottom: var(--space-2);
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
 }
 
-.create-trip-form__submit {
-  margin-top: var(--space-5);
+.create-trip-form__passenger-row .ui-input {
+  flex: 1 1 180px;
+}
+
+.create-trip-form__remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2);
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.create-trip-form__remove:hover {
+  color: var(--color-danger);
+  background: var(--color-surface-alt);
+}
+
+.create-trip-form__remove ion-icon {
+  font-size: 1.0625rem;
+}
+
+.create-trip-form__error {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-danger);
 }
 
 .create-trip-success {
@@ -44,7 +71,8 @@
   text-align: center;
   gap: var(--space-3);
   max-width: 360px;
-  margin: var(--space-6) auto 0 auto;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5);
 }
 
 .create-trip-success__icon {
@@ -53,12 +81,14 @@
 
 .create-trip-success h2 {
   font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
   margin: 0;
 }
 
 .create-trip-success p {
   color: var(--color-text-muted);
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   margin: 0 0 var(--space-2) 0;
 }
 

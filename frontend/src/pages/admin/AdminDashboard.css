@@ -9,13 +9,15 @@
 
 .admin-dashboard__toolbar h2 {
   font-family: var(--font-display);
-  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 600;
+  margin: 0 0 4px 0;
 }
 
 .admin-dashboard__toolbar p {
   color: var(--color-text-muted);
-  margin: 4px 0 0 0;
-  font-size: 0.85rem;
+  margin: 0;
+  font-size: 0.875rem;
 }
 
 .admin-dashboard__empty {
@@ -28,6 +30,7 @@
   background: var(--color-surface);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
 }
 
@@ -38,17 +41,18 @@
 .admin-table th {
   text-align: left;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.6875rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--color-text-muted);
-  padding: var(--space-3) var(--space-4);
+  font-weight: 500;
+  padding: var(--space-3) var(--space-5);
 }
 
 .admin-table td {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-4) var(--space-5);
   border-top: var(--border-width) solid var(--color-border);
-  font-size: 0.9rem;
+  font-size: 0.875rem;
 }
 
 .admin-table__row {
@@ -62,6 +66,7 @@
 
 .admin-table__code {
   font-family: var(--font-mono);
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--color-accent);
 }
@@ -110,6 +115,7 @@
     background: var(--color-surface);
     border: var(--border-width) solid var(--color-border);
     border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
     padding: var(--space-2) var(--space-4);
   }
 

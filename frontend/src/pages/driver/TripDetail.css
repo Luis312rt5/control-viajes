@@ -1,32 +1,41 @@
-.trip-detail__header {
+.trip-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* El nombre y el documento van como contenido del propio ion-checkbox
+   (labelPlacement="end"), no en un <label> externo: un <label> nativo no
+   alterna un web component, mientras que así toda la fila queda clickeable
+   sin tocar la lógica de check-in. */
+.trip-detail__passenger {
+  width: 100%;
+  --checkbox-background-checked: var(--color-accent);
+}
+
+.trip-detail__passenger::part(label) {
+  margin-inline-start: var(--space-3);
+  white-space: normal;
+}
+
+.trip-detail__signed {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-4);
-}
-
-.trip-detail__header h2 {
-  font-family: var(--font-display);
-  font-size: 1.2rem;
+  gap: var(--space-2);
   margin: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-success);
 }
 
-.trip-detail__section-title {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-text-muted);
-  margin: 0 0 var(--space-2) 0;
-}
-
-.trip-detail__start-btn {
-  margin-top: var(--space-4);
+.trip-detail__signed ion-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
 }
 
 .trip-detail__lock-note {
   text-align: center;
-  font-size: 0.8rem;
+  font-size: 0.8125rem;
   color: var(--color-text-muted);
-  margin-top: var(--space-2);
+  margin: var(--space-3) 0 0;
 }

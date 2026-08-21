@@ -1,12 +1,12 @@
 /*
   Sistema de tokens del proyecto "Control de Viajes".
-  Dirección visual: dashboard SaaS premium — fondos profundos, tarjetas
-  elevadas con bordes sutiles, resplandor de marca en acciones clave,
-  header con efecto vidrio (glassmorphism). Acento: verde Nodotech.
+  Dirección visual (rediseño): superficies limpias con bordes sutiles,
+  header sólido oscuro constante en los 3 temas, tipografía Space Grotesk
+  para títulos e IBM Plex Mono para códigos/etiquetas. Acento: verde Nodotech.
 
   Tres modos disponibles vía atributo en <html data-theme="...">:
     - light    (operación de día, uso del Administrador en escritorio)
-    - dark     (uso del Conductor de noche/en ruta) — el modo "premium" principal
+    - dark     (uso del Conductor de noche/en ruta)
     - custom   (colores editables en tiempo real desde el selector de tema)
 */
 
@@ -18,10 +18,11 @@
   --font-body: 'IBM Plex Sans', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
 
-  /* Radios suaves tipo dashboard SaaS (antes eran más rectos/"señal vial") */
-  --radius-sm: 8px;
-  --radius-md: 12px;
+  /* Radios del rediseño: campos/botones 10px, tarjetas 14px, hero 18px */
+  --radius-sm: 10px;
+  --radius-md: 14px;
   --radius-lg: 18px;
+  --radius-pill: 999px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -30,12 +31,13 @@
   --space-6: 32px;
   --space-7: 48px;
 
-  /* Acento de marca (Nodotech) — se mantiene en los 3 temas */
+  /* Acento de marca (Nodotech) — se mantiene en claro y oscuro */
   --color-accent: #0F8E6A;
   --color-accent-shade: #0D7D5D;
   --color-accent-tint: #279973;
   --color-accent-ink: #F5FBF9;
   --color-accent-glow: rgba(15, 142, 106, 0.45);
+  --color-accent-ring: rgba(15, 142, 106, 0.22);
 
   /* Semánticos de estado (comunes a los 3 temas) */
   --color-success: #2E9E5B;
@@ -105,10 +107,10 @@
   --color-header-bg: #0B0D11;
   --color-header-text: #F2F1ED;
   --shadow-card: 0 1px 2px rgba(20, 22, 27, 0.04), 0 12px 28px rgba(20, 22, 27, 0.08);
-  --header-glass-bg: rgba(11, 13, 17, 0.85);
+  --shadow-pop: 0 1px 2px rgba(20, 22, 27, 0.04), 0 16px 40px rgba(20, 22, 27, 0.16);
 }
 
-/* ============ MODO OSCURO (Conductor / en ruta) — "premium" ============ */
+/* ============ MODO OSCURO (Conductor / en ruta) ============ */
 :root[data-theme='dark'] {
   --color-bg: #0B0D11;
   --color-surface: #14171D;
@@ -119,24 +121,63 @@
   --color-header-bg: #0B0D11;
   --color-header-text: #F2F1ED;
   --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.45);
-  --header-glass-bg: rgba(11, 13, 17, 0.7);
+  --shadow-pop: 0 1px 1px rgba(0, 0, 0, 0.3), 0 20px 48px rgba(0, 0, 0, 0.55);
+
+  /* La píldora de estado "Cerrado" usa el color "dark" de Ionic. En claro es
+     casi negra sobre blanco y se lee perfecto, pero sobre la superficie oscura
+     desaparecía: aquí se aclara lo justo para seguir siendo una píldora
+     neutra y a la vez distinguirse de la tarjeta. */
+  --ion-color-dark: #262B34;
+  --ion-color-dark-rgb: 38, 43, 52;
+  --ion-color-dark-contrast: #EDEEF0;
+  --ion-color-dark-contrast-rgb: 237, 238, 240;
+  --ion-color-dark-shade: #21252d;
+  --ion-color-dark-tint: #3c4048;
 }
 
 /* ============ MODO PERSONALIZADO ============ */
-/* Valores iniciales; el ThemeSwitcher los sobreescribe en runtime vía JS
-   (document.documentElement.style.setProperty) y persiste en localStorage. */
+/* El usuario elige solo 4 colores (fondo, superficie, texto, acento); el
+   resto de la paleta se DERIVA de esos con color-mix para que el tema siga
+   siendo legible sin importar si eligió una base clara u oscura. Antes estos
+   derivados quedaban fijos en los valores del tema oscuro, así que un tema
+   personalizado claro mostraba bordes y texto secundario invisibles.
+   Los valores planos que van primero son el respaldo para motores sin
+   color-mix (la declaración inválida se descarta y queda el respaldo).
+   --color-accent-ink y --ion-color-primary-rgb los calcula ThemeContext en
+   runtime, porque dependen de la luminancia del acento elegido. */
 :root[data-theme='custom'] {
-  --color-bg: #0B0D11;
-  --color-surface: #14171D;
-  --color-surface-alt: #1B1F27;
-  --color-border: rgba(255, 255, 255, 0.08);
+  --color-bg: #14161B;
+  --color-surface: #1D2027;
   --color-text: #EDEEF0;
+  --color-accent: #F5A623;
+
+  --color-surface-alt: #262A33;
+  --color-border: rgba(255, 255, 255, 0.16);
   --color-text-muted: #9AA0AC;
   --color-header-bg: #0B0D11;
-  --color-header-text: #F2F1ED;
-  --color-accent: #0F8E6A;
+  --color-accent-shade: #C0821B;
+  --color-accent-glow: rgba(245, 166, 35, 0.45);
+  --color-accent-ring: rgba(245, 166, 35, 0.22);
+
+  --color-surface-alt: color-mix(in srgb, var(--color-surface) 88%, var(--color-text));
+  --color-border: color-mix(in srgb, var(--color-text) 16%, transparent);
+  --color-text-muted: color-mix(in srgb, var(--color-text) 58%, var(--color-bg));
+  --color-header-bg: color-mix(in srgb, var(--color-bg) 70%, #000000);
+  --color-accent-shade: color-mix(in srgb, var(--color-accent) 78%, #000000);
+  --color-accent-tint: color-mix(in srgb, var(--color-accent) 82%, #FFFFFF);
+  --color-accent-glow: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  --color-accent-ring: color-mix(in srgb, var(--color-accent) 22%, transparent);
+
+  --color-header-text: var(--color-text);
   --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.3), 0 16px 40px rgba(0, 0, 0, 0.45);
-  --header-glass-bg: rgba(11, 13, 17, 0.7);
+  --shadow-pop: 0 1px 1px rgba(0, 0, 0, 0.3), 0 20px 48px rgba(0, 0, 0, 0.55);
+
+  /* Píldora de estado neutra, derivada de la superficie elegida para que se
+     distinga de la tarjeta sin importar si el tema es claro u oscuro. */
+  --ion-color-dark: #262B34;
+  --ion-color-dark-contrast: #EDEEF0;
+  --ion-color-dark: color-mix(in srgb, var(--color-surface) 72%, var(--color-text));
+  --ion-color-dark-contrast: var(--color-surface);
 }
 
 /* Reset ligero + anulación deliberada de defaults de Ionic */
@@ -150,31 +191,37 @@ body {
 ion-content {
   --background: var(--color-bg);
   --color: var(--color-text);
-  /* Halo radial sutil detrás del contenido, típico de dashboards SaaS oscuros */
-  background-image: radial-gradient(
-    circle at 15% -10%,
-    rgba(15, 142, 106, 0.12),
-    transparent 45%
-  );
 }
 
-/* Header con efecto vidrio (glassmorphism): translúcido + blur, se mantiene
-   fijo y oscuro en los 3 temas para dar continuidad de marca en toda la app. */
+/* Header sólido (el rediseño reemplaza el efecto vidrio anterior): la misma
+   barra oscura en los 3 temas da continuidad de marca en toda la app. */
 ion-header {
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
+  box-shadow: none;
+}
+
+ion-header::after {
+  display: none;
 }
 
 ion-header ion-toolbar {
-  --background: var(--header-glass-bg);
+  --background: var(--color-header-bg);
   --color: var(--color-header-text);
   --border-width: 0;
+  --min-height: 60px;
+  --padding-start: var(--space-3);
+  --padding-end: var(--space-3);
 }
 
 ion-title {
   font-family: var(--font-display);
   font-weight: 600;
-  letter-spacing: 0.02em;
+  font-size: 1.1875rem;
+  letter-spacing: 0.01em;
+}
+
+ion-toolbar ion-button,
+ion-toolbar ion-back-button {
+  --color: var(--color-header-text);
 }
 
 ion-card {
@@ -183,11 +230,7 @@ ion-card {
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-card);
-  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
-}
-
-ion-card:hover {
-  border-color: var(--color-accent);
+  margin-inline: 0;
 }
 
 ion-button {
@@ -204,7 +247,7 @@ ion-button.button-solid {
   --color: var(--color-accent-ink);
   --background-activated: var(--color-accent-shade);
   --background-hover: var(--color-accent-shade);
-  --box-shadow: 0 0 0 1px rgba(15, 142, 106, 0.5), 0 8px 24px var(--color-accent-glow);
+  --box-shadow: 0 8px 24px var(--color-accent-glow);
 }
 
 ion-button.button-outline {
@@ -222,11 +265,12 @@ ion-item {
 }
 
 ion-badge {
-  border-radius: 999px;
-  font-family: var(--font-mono);
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  font-size: 0.75rem;
+  padding: 5px 12px;
 }
 
 ion-checkbox {
@@ -234,6 +278,272 @@ ion-checkbox {
   --border-color-checked: var(--color-accent);
 }
 
-ion-toolbar ion-back-button {
-  --color: var(--color-header-text);
+/* ============================================================
+   Primitivas compartidas del rediseño
+   Los formularios de la app usan controles nativos con este mismo
+   tratamiento (etiqueta arriba, campo redondeado sobre superficie) en
+   vez de ion-item, que impone su propia línea inferior y espaciado.
+   ============================================================ */
+
+.ui-field {
+  display: block;
+  min-width: 0;
 }
+
+.ui-field__label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.ui-input,
+.ui-select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ui-input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.75;
+}
+
+.ui-input:focus,
+.ui-select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-ring);
+}
+
+.ui-select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+/* Título de sección en mono, mayúsculas y espaciado amplio */
+.ui-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.ui-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 88px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ui-textarea::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.75;
+}
+
+.ui-textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-ring);
+}
+
+/* Tarjeta contenedora estándar */
+.ui-card {
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+/* Tarjeta con el padding interno ya resuelto, para bloques de contenido */
+.ui-section {
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-5);
+}
+
+.ui-section > .ui-eyebrow {
+  margin-bottom: var(--space-3);
+}
+
+/* ---- Fila de lista dentro de una sección ----
+   Es el patrón que se repite en gastos, novedades, pasajeros y resumen:
+   icono opcional + título + subtítulo a la izquierda, valor a la derecha,
+   separadas por una línea superior. Vive aquí para que las cuatro pantallas
+   que lo usan no mantengan cuatro copias del mismo CSS. */
+.ui-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-top: var(--border-width) solid var(--color-border);
+}
+
+.ui-row__main {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.ui-row__icon {
+  font-size: 1.125rem;
+  color: var(--color-accent);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.ui-row__icon--warning {
+  color: var(--color-warning);
+}
+
+.ui-row__title {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.ui-row__sub {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.ui-row__value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.ui-empty {
+  margin: 0;
+  padding-top: var(--space-3);
+  border-top: var(--border-width) solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+/* Estado de carga a pantalla completa: el spinner suelto en la esquina
+   superior izquierda se leía como un glitch más que como "cargando". */
+.ui-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  color: var(--color-text-muted);
+}
+
+/* Encabezado de las pantallas de detalle: ruta + píldora de estado */
+.ui-page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-5);
+}
+
+.ui-page-head h2 {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.ui-page-head p {
+  margin: 4px 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+/* Botón de acción principal (nativo, mismo aspecto que ion-button solid) */
+.ui-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 13px 18px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  box-shadow: 0 8px 24px var(--color-accent-glow);
+  transition: filter 0.15s ease;
+}
+
+.ui-button:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+.ui-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+  box-shadow: none;
+}
+
+.ui-button--block {
+  width: 100%;
+}
+
+.ui-button--ghost {
+  background: none;
+  color: var(--color-accent);
+  border: var(--border-width) solid var(--color-accent);
+  box-shadow: none;
+  padding: 8px 14px;
+  font-size: 0.8125rem;
+}
+
+/* Acción destructiva/definitiva (cerrar viaje): peso visual alto pero sin
+   competir con el acento de marca, que se reserva para el avance normal. */
+.ui-button--dark {
+  background: var(--color-header-bg);
+  color: var(--color-header-text);
+  box-shadow: none;
+  border: var(--border-width) solid var(--color-border);
+}
+
+/* Columna de contenido de cada pantalla: ancho máximo cómodo y centrada */
+.page-shell {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5);
+  box-sizing: border-box;
+}
+
+.page-shell--narrow {
+  max-width: 640px;
+}
+

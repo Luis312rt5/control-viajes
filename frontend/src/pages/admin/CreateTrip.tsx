@@ -8,23 +8,18 @@ import {
   IonTitle,
   IonButtons,
   IonBackButton,
-  IonItem,
-  IonLabel,
-  IonInput,
-  IonSelect,
-  IonSelectOption,
   IonButton,
   IonIcon,
-  IonText,
   IonSpinner,
 } from '@ionic/react';
-import { addOutline, trashOutline, checkmarkCircleOutline } from 'ionicons/icons';
+import { addOutline, closeOutline, checkmarkCircleOutline } from 'ionicons/icons';
 import { fetchDrivers } from '../../api/users';
 import { createTrip } from '../../api/trips';
 import { Driver, Trip } from '../../api/types';
 import { extractErrorMessage } from '../../api/client';
 import { TripQrCode } from '../../components/TripQrCode';
 import { CityAutocomplete } from '../../components/CityAutocomplete';
+import { AppTabs } from '../../components/AppTabs';
 import './CreateTrip.css';
 
 interface PassengerRow {
@@ -91,8 +86,9 @@ export function CreateTrip() {
             </IonButtons>
             <IonTitle>Viaje creado</IonTitle>
           </IonToolbar>
+          <AppTabs placement="top" />
         </IonHeader>
-        <IonContent className="ion-padding">
+        <IonContent>
           <div className="create-trip-success">
             <IonIcon icon={checkmarkCircleOutline} color="success" className="create-trip-success__icon" />
             <h2>{createdTrip.code} creado correctamente</h2>
@@ -117,6 +113,8 @@ export function CreateTrip() {
             </IonButton>
           </div>
         </IonContent>
+
+        <AppTabs placement="bottom" />
       </IonPage>
     );
   }
@@ -130,9 +128,10 @@ export function CreateTrip() {
           </IonButtons>
           <IonTitle>Nuevo viaje</IonTitle>
         </IonToolbar>
+        <AppTabs placement="top" />
       </IonHeader>
-      <IonContent className="ion-padding">
-        <form onSubmit={handleSubmit} className="create-trip-form">
+      <IonContent>
+        <form onSubmit={handleSubmit} className="page-shell page-shell--narrow create-trip-form">
           <div className="create-trip-form__row">
             <CityAutocomplete
               label="Origen"
@@ -148,65 +147,70 @@ export function CreateTrip() {
             />
           </div>
 
-          <IonItem>
-            <IonLabel position="stacked">Conductor asignado</IonLabel>
-            <IonSelect value={driverId} onIonChange={(e) => setDriverId(e.detail.value)}>
+          <label className="ui-field">
+            <span className="ui-field__label">Conductor asignado</span>
+            <select
+              className="ui-select"
+              value={driverId}
+              onChange={(e) => setDriverId(e.target.value)}
+            >
+              <option value="">Selecciona un conductor</option>
               {drivers.map((d) => (
-                <IonSelectOption key={d.id} value={d.id}>
+                <option key={d.id} value={d.id}>
                   {d.fullName}
-                </IonSelectOption>
+                </option>
               ))}
-            </IonSelect>
-          </IonItem>
+            </select>
+          </label>
 
-          <div className="create-trip-form__passengers-header">
-            <p>Pasajeros</p>
-            <IonButton size="small" fill="outline" onClick={addPassenger} type="button">
-              <IonIcon icon={addOutline} slot="start" />
-              Agregar
-            </IonButton>
+          <div>
+            <div className="create-trip-form__passengers-header">
+              <p className="ui-eyebrow">Pasajeros</p>
+              <button type="button" className="ui-button ui-button--ghost" onClick={addPassenger}>
+                <IonIcon icon={addOutline} />
+                Agregar
+              </button>
+            </div>
+
+            {passengers.map((p, index) => (
+              <div key={index} className="create-trip-form__passenger-row">
+                <input
+                  className="ui-input"
+                  value={p.name}
+                  placeholder="Nombre"
+                  aria-label={`Nombre del pasajero ${index + 1}`}
+                  onChange={(e) => updatePassenger(index, 'name', e.target.value)}
+                />
+                <input
+                  className="ui-input"
+                  value={p.document}
+                  placeholder="Documento"
+                  aria-label={`Documento del pasajero ${index + 1}`}
+                  onChange={(e) => updatePassenger(index, 'document', e.target.value)}
+                />
+                {passengers.length > 1 && (
+                  <button
+                    type="button"
+                    className="create-trip-form__remove"
+                    aria-label={`Quitar pasajero ${index + 1}`}
+                    onClick={() => removePassenger(index)}
+                  >
+                    <IonIcon icon={closeOutline} />
+                  </button>
+                )}
+              </div>
+            ))}
           </div>
 
-          {passengers.map((p, index) => (
-            <div key={index} className="create-trip-form__passenger-row">
-              <IonItem>
-                <IonLabel position="stacked">Nombre</IonLabel>
-                <IonInput
-                  value={p.name}
-                  onIonInput={(e) => updatePassenger(index, 'name', e.detail.value || '')}
-                />
-              </IonItem>
-              <IonItem>
-                <IonLabel position="stacked">Documento</IonLabel>
-                <IonInput
-                  value={p.document}
-                  onIonInput={(e) => updatePassenger(index, 'document', e.detail.value || '')}
-                />
-              </IonItem>
-              {passengers.length > 1 && (
-                <IonButton
-                  fill="clear"
-                  color="danger"
-                  type="button"
-                  onClick={() => removePassenger(index)}
-                >
-                  <IonIcon icon={trashOutline} slot="icon-only" />
-                </IonButton>
-              )}
-            </div>
-          ))}
+          {error && <p className="create-trip-form__error">{error}</p>}
 
-          {error && (
-            <IonText color="danger">
-              <p>{error}</p>
-            </IonText>
-          )}
-
-          <IonButton expand="block" type="submit" disabled={saving} className="create-trip-form__submit">
+          <button type="submit" className="ui-button ui-button--block" disabled={saving}>
             {saving ? <IonSpinner name="dots" /> : 'Crear viaje'}
-          </IonButton>
+          </button>
         </form>
       </IonContent>
+
+      <AppTabs placement="bottom" />
     </IonPage>
   );
 }

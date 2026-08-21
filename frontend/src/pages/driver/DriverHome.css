@@ -1,15 +1,11 @@
 .driver-home__greeting {
-  padding: var(--space-5) var(--space-4) 0 var(--space-4);
+  margin: 0 0 var(--space-4);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text);
 }
 
-.driver-home__greeting p {
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  margin: 0;
-}
-
-.driver-home__loading,
-.driver-home__empty {
+.driver-home__state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -19,6 +15,77 @@
   gap: var(--space-3);
 }
 
-.driver-home__empty ion-icon {
+.driver-home__state p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.driver-home__state ion-icon {
   font-size: 2.5rem;
+}
+
+/* Lista de viajes: una sola tarjeta con filas separadas por línea, en vez de
+   una tarjeta por viaje. Cada fila es un <button> para que sea accesible por
+   teclado sin perder el layout de la maqueta. */
+.trip-list {
+  overflow: hidden;
+}
+
+.trip-list__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  width: 100%;
+  box-sizing: border-box;
+  padding: 18px var(--space-5);
+  background: none;
+  border: none;
+  border-bottom: var(--border-width) solid var(--color-border);
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: background 0.15s ease;
+}
+
+.trip-list__row:last-child {
+  border-bottom: none;
+}
+
+.trip-list__row:hover {
+  background: var(--color-surface-alt);
+}
+
+.trip-list__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.trip-list__code {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.trip-list__route {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trip-list__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.trip-list__meta ion-icon {
+  font-size: 1.125rem;
+  color: var(--color-text-muted);
 }

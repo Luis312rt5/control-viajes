@@ -1,17 +1,10 @@
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import {
-  IonContent,
-  IonPage,
-  IonInput,
-  IonButton,
-  IonItem,
-  IonLabel,
-  IonText,
-  IonSpinner,
-} from '@ionic/react';
+import { IonContent, IonPage, IonIcon, IonSpinner } from '@ionic/react';
+import { busOutline, mailOutline, lockClosedOutline } from 'ionicons/icons';
 import { useAuth } from '../contexts/AuthContext';
 import { extractErrorMessage } from '../api/client';
+import { ThemeSwitcher } from '../components/ThemeSwitcher';
 import './Login.css';
 
 export function Login() {
@@ -35,51 +28,57 @@ export function Login() {
   return (
     <IonPage>
       <IonContent className="login-page" fullscreen>
+        <div className="login-page__theme">
+          <ThemeSwitcher />
+        </div>
+
         <div className="login-card">
           <div className="login-brand">
-            <span className="login-brand__mark">VJ</span>
-            <div>
-              <h1>Control de Viajes</h1>
-              <p>Ingresa con tu cuenta asignada</p>
-            </div>
+            <span className="login-brand__mark">
+              <IonIcon icon={busOutline} />
+            </span>
+            <span className="login-brand__name">Control de Viajes</span>
           </div>
 
           <form onSubmit={handleSubmit} className="login-form">
-            <IonItem>
-              <IonLabel position="stacked">Correo</IonLabel>
-              <IonInput
-                type="email"
-                value={email}
-                required
-                onIonInput={(e) => setEmail(e.detail.value || '')}
-                placeholder="admin@viajes.com"
-              />
-            </IonItem>
-            <IonItem>
-              <IonLabel position="stacked">Contraseña</IonLabel>
-              <IonInput
-                type="password"
-                value={password}
-                required
-                onIonInput={(e) => setPassword(e.detail.value || '')}
-                placeholder="••••••••"
-              />
-            </IonItem>
+            <label className="ui-field">
+              <span className="ui-field__label">Correo</span>
+              <span className="login-field">
+                <IonIcon icon={mailOutline} />
+                <input
+                  type="email"
+                  value={email}
+                  required
+                  autoComplete="email"
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@viajes.com"
+                />
+              </span>
+            </label>
 
-            {error && (
-              <IonText color="danger">
-                <p className="login-error">{error}</p>
-              </IonText>
-            )}
+            <label className="ui-field">
+              <span className="ui-field__label">Contraseña</span>
+              <span className="login-field">
+                <IonIcon icon={lockClosedOutline} />
+                <input
+                  type="password"
+                  value={password}
+                  required
+                  autoComplete="current-password"
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                />
+              </span>
+            </label>
 
-            <IonButton expand="block" type="submit" disabled={isLoading}>
-              {isLoading ? <IonSpinner name="dots" /> : 'Ingresar'}
-            </IonButton>
+            {error && <p className="login-error">{error}</p>}
+
+            <button type="submit" className="ui-button ui-button--block" disabled={isLoading}>
+              {isLoading ? <IonSpinner name="dots" /> : 'Iniciar sesión'}
+            </button>
           </form>
 
-          <p className="login-hint">
-            Admin: admin@viajes.com / Admin123! · Conductor: conductor@viajes.com / Conductor123!
-          </p>
+          <p className="login-hint">admin@viajes.com · conductor@viajes.com</p>
         </div>
       </IonContent>
     </IonPage>

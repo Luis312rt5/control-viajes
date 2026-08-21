@@ -1,17 +1,8 @@
 import { useEffect, useState } from 'react';
 import {
-  IonCard,
-  IonCardContent,
   IonSegment,
   IonSegmentButton,
   IonLabel,
-  IonItem,
-  IonInput,
-  IonSelect,
-  IonSelectOption,
-  IonTextarea,
-  IonButton,
-  IonList,
   IonIcon,
   IonToast,
   IonSpinner,
@@ -103,7 +94,11 @@ export function RouteOperations({ tripId, onClose, busy }: RouteOperationsProps)
 
   return (
     <div className="route-ops">
-      <IonSegment value={tab} onIonChange={(e) => setTab(e.detail.value as any)}>
+      <IonSegment
+        className="route-ops__segment"
+        value={tab}
+        onIonChange={(e) => setTab(e.detail.value as any)}
+      >
         <IonSegmentButton value="expenses">
           <IonIcon icon={cashOutline} />
           <IonLabel>Gastos</IonLabel>
@@ -115,113 +110,160 @@ export function RouteOperations({ tripId, onClose, busy }: RouteOperationsProps)
       </IonSegment>
 
       {tab === 'expenses' && (
-        <IonCard>
-          <IonCardContent>
-            <IonItem>
-              <IonLabel position="stacked">Concepto</IonLabel>
-              <IonSelect value={expenseType} onIonChange={(e) => setExpenseType(e.detail.value)}>
+        <>
+          <section className="ui-section route-ops__form">
+            <p className="ui-eyebrow">Registrar gasto</p>
+
+            <label className="ui-field">
+              <span className="ui-field__label">Concepto</span>
+              <select
+                className="ui-select"
+                value={expenseType}
+                onChange={(e) => setExpenseType(e.target.value as ExpenseType)}
+              >
                 {Object.entries(EXPENSE_LABELS).map(([value, label]) => (
-                  <IonSelectOption key={value} value={value}>
+                  <option key={value} value={value}>
                     {label}
-                  </IonSelectOption>
+                  </option>
                 ))}
-              </IonSelect>
-            </IonItem>
-            <IonItem>
-              <IonLabel position="stacked">Monto (COP)</IonLabel>
-              <IonInput
+              </select>
+            </label>
+
+            <label className="ui-field">
+              <span className="ui-field__label">Monto (COP)</span>
+              <input
+                className="ui-input"
                 type="number"
+                inputMode="numeric"
                 value={amount}
-                onIonInput={(e) => setAmount(e.detail.value || '')}
+                onChange={(e) => setAmount(e.target.value)}
                 placeholder="50000"
               />
-            </IonItem>
-            <IonItem>
-              <IonLabel position="stacked">Descripción</IonLabel>
-              <IonInput
+            </label>
+
+            <label className="ui-field">
+              <span className="ui-field__label">Descripción</span>
+              <input
+                className="ui-input"
                 value={concept}
-                onIonInput={(e) => setConcept(e.detail.value || '')}
+                onChange={(e) => setConcept(e.target.value)}
                 placeholder="Ej: Tanqueo en estación La 5ta"
               />
-            </IonItem>
-            <IonButton
-              expand="block"
+            </label>
+
+            <button
+              type="button"
+              className="ui-button ui-button--block"
               onClick={submitExpense}
               disabled={savingExpense || !amount || !concept}
             >
               {savingExpense ? <IonSpinner name="dots" /> : 'Registrar gasto'}
-            </IonButton>
+            </button>
+          </section>
 
-            <IonList className="route-ops__list">
-              {expenses.map((e) => (
-                <IonItem key={e.id} lines="full">
-                  <IonLabel>
-                    <h3>{EXPENSE_LABELS[e.type]}</h3>
-                    <p>{e.concept}</p>
-                  </IonLabel>
-                  <IonLabel slot="end" className="route-ops__amount">
-                    ${Number(e.amount).toLocaleString('es-CO')}
-                  </IonLabel>
-                </IonItem>
-              ))}
-            </IonList>
-            {expenses.length > 0 && (
-              <p className="route-ops__total">
-                Total gastos: <strong>${totalExpenses.toLocaleString('es-CO')}</strong>
-              </p>
+          <section className="ui-section">
+            <p className="ui-eyebrow">Gastos del viaje</p>
+            {expenses.length === 0 ? (
+              <p className="ui-empty">Todavía no has reportado gastos.</p>
+            ) : (
+              <>
+                {expenses.map((e) => (
+                  <div key={e.id} className="ui-row">
+                    <span className="ui-row__main">
+                      <IonIcon icon={cashOutline} className="ui-row__icon" />
+                      <span>
+                        <span className="ui-row__title">{EXPENSE_LABELS[e.type]}</span>
+                        <span className="ui-row__sub">{e.concept}</span>
+                      </span>
+                    </span>
+                    <span className="ui-row__value route-ops__amount">
+                      ${Number(e.amount).toLocaleString('es-CO')}
+                    </span>
+                  </div>
+                ))}
+                <div className="ui-row route-ops__total">
+                  <span className="ui-row__title">Total gastos</span>
+                  <span className="ui-row__value route-ops__amount">
+                    ${totalExpenses.toLocaleString('es-CO')}
+                  </span>
+                </div>
+              </>
             )}
-          </IonCardContent>
-        </IonCard>
+          </section>
+        </>
       )}
 
       {tab === 'incidents' && (
-        <IonCard>
-          <IonCardContent>
-            <IonItem>
-              <IonLabel position="stacked">Tipo de novedad</IonLabel>
-              <IonSelect value={incidentType} onIonChange={(e) => setIncidentType(e.detail.value)}>
+        <>
+          <section className="ui-section route-ops__form">
+            <p className="ui-eyebrow">Registrar novedad</p>
+
+            <label className="ui-field">
+              <span className="ui-field__label">Tipo de novedad</span>
+              <select
+                className="ui-select"
+                value={incidentType}
+                onChange={(e) => setIncidentType(e.target.value as IncidentType)}
+              >
                 {Object.entries(INCIDENT_LABELS).map(([value, label]) => (
-                  <IonSelectOption key={value} value={value}>
+                  <option key={value} value={value}>
                     {label}
-                  </IonSelectOption>
+                  </option>
                 ))}
-              </IonSelect>
-            </IonItem>
-            <IonItem>
-              <IonLabel position="stacked">Descripción</IonLabel>
-              <IonTextarea
+              </select>
+            </label>
+
+            <label className="ui-field">
+              <span className="ui-field__label">Descripción</span>
+              <textarea
+                className="ui-textarea"
                 value={description}
-                onIonInput={(e) => setDescription(e.detail.value || '')}
+                onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe lo ocurrido..."
                 rows={3}
               />
-            </IonItem>
-            <IonButton
-              expand="block"
+            </label>
+
+            <button
+              type="button"
+              className="ui-button ui-button--block"
               onClick={submitIncident}
               disabled={savingIncident || !description}
             >
               {savingIncident ? <IonSpinner name="dots" /> : 'Registrar novedad'}
-            </IonButton>
+            </button>
+          </section>
 
-            <IonList className="route-ops__list">
-              {incidents.map((i) => (
-                <IonItem key={i.id} lines="full">
-                  <IonLabel>
-                    <h3>{INCIDENT_LABELS[i.type]}</h3>
-                    <p>{i.description}</p>
-                  </IonLabel>
-                </IonItem>
-              ))}
-            </IonList>
-          </IonCardContent>
-        </IonCard>
+          <section className="ui-section">
+            <p className="ui-eyebrow">Novedades del viaje</p>
+            {incidents.length === 0 ? (
+              <p className="ui-empty">Todavía no has reportado novedades.</p>
+            ) : (
+              incidents.map((i) => (
+                <div key={i.id} className="ui-row">
+                  <span className="ui-row__main">
+                    <IonIcon icon={warningOutline} className="ui-row__icon ui-row__icon--warning" />
+                    <span>
+                      <span className="ui-row__title">{INCIDENT_LABELS[i.type]}</span>
+                      <span className="ui-row__sub">{i.description}</span>
+                    </span>
+                  </span>
+                </div>
+              ))
+            )}
+          </section>
+        </>
       )}
 
-      <IonButton expand="block" color="dark" onClick={onClose} disabled={busy}>
-        <IonIcon icon={lockClosedOutline} slot="start" />
+      <button
+        type="button"
+        className="ui-button ui-button--block ui-button--dark"
+        onClick={onClose}
+        disabled={busy}
+      >
+        <IonIcon icon={lockClosedOutline} />
         Cerrar viaje
-      </IonButton>
+      </button>
 
       <IonToast
         isOpen={!!toastMsg}

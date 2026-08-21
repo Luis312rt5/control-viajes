@@ -4,17 +4,46 @@
   gap: var(--space-4);
 }
 
-.route-ops__list {
-  margin-top: var(--space-4);
+/* Segmento con el mismo lenguaje que el resto: píldora sobre superficie
+   alterna y el seleccionado en acento, en vez del gris por defecto de Ionic. */
+.route-ops__segment {
+  --background: var(--color-surface-alt);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+}
+
+.route-ops__segment ion-segment-button {
+  --background-checked: var(--color-surface);
+  --color: var(--color-text-muted);
+  --color-checked: var(--color-accent);
+  --indicator-color: var(--color-surface);
+  --border-radius: 8px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  min-height: 42px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.route-ops__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
 
 .route-ops__amount {
   font-family: var(--font-mono);
-  font-weight: 600;
 }
 
+/* El total cierra la lista, así que se separa con un poco más de aire y
+   pierde el borde superior fino para no leerse como un gasto más. */
 .route-ops__total {
-  text-align: right;
-  margin-top: var(--space-3);
-  font-size: 0.9rem;
+  margin-top: var(--space-2);
+  padding-top: var(--space-4);
+  border-top-width: 2px;
+  align-items: center;
 }

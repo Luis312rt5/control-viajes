@@ -1,0 +1,78 @@
+/* Una sola pieza de navegación con dos presentaciones, tal como el diseño:
+   pestañas bajo el header en pantallas anchas y barra inferior en angostas.
+   El corte lo decide CSS (no un listener de resize) para que la barra correcta
+   ya esté pintada en el primer frame. */
+
+.app-tabs {
+  display: flex;
+  background: var(--color-surface);
+  font-family: var(--font-body);
+}
+
+.app-tabs__tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-family: inherit;
+  font-weight: 600;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.app-tabs__tab--active {
+  color: var(--color-accent);
+}
+
+/* ---- Pestañas superiores (escritorio / tablet) ---- */
+.app-tabs--top {
+  gap: var(--space-1);
+  padding: 0 var(--space-5);
+  border-bottom: var(--border-width) solid var(--color-border);
+  overflow-x: auto;
+}
+
+.app-tabs--top .app-tabs__tab {
+  padding: 14px var(--space-4);
+  font-size: 0.875rem;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+}
+
+.app-tabs--top .app-tabs__tab--active {
+  border-bottom-color: var(--color-accent);
+}
+
+/* ---- Barra inferior (celular) ---- */
+.app-tabs--bottom {
+  border-top: var(--border-width) solid var(--color-border);
+  padding: var(--space-2) var(--space-1);
+  padding-bottom: calc(var(--space-2) + env(safe-area-inset-bottom));
+}
+
+.app-tabs--bottom .app-tabs__tab {
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  padding: 6px var(--space-1);
+  font-size: 0.6875rem;
+  font-weight: 500;
+}
+
+.app-tabs--bottom .app-tabs__tab ion-icon {
+  font-size: 1.3125rem;
+}
+
+@media (max-width: 759px) {
+  .app-tabs--top {
+    display: none;
+  }
+}
+
+@media (min-width: 760px) {
+  .app-tabs--bottom {
+    display: none;
+  }
+}

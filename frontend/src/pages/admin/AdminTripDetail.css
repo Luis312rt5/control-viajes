@@ -1,23 +1,21 @@
-.admin-trip-detail__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: var(--space-5);
-}
-
-.admin-trip-detail__header h2 {
-  font-family: var(--font-display);
-  margin: 0 0 4px 0;
-}
-
-.admin-trip-detail__header p {
-  color: var(--color-text-muted);
-  font-size: 0.85rem;
-  margin: 0;
-}
+/* El encabezado, las secciones y las filas usan las primitivas compartidas
+   (.ui-page-head / .ui-section / .ui-row); las tarjetas de indicadores vienen
+   de TripSummary.css, que esta pantalla también importa. */
 
 .admin-trip-detail__qr {
   display: flex;
   justify-content: center;
-  margin-bottom: var(--space-5);
+}
+
+/* Pasajero que no abordó: el mismo icono en tono apagado comunica el estado
+   sin recurrir a un checkbox deshabilitado, que se lee como "roto". */
+.admin-trip-detail__pending {
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
+
+.admin-trip-detail__boarded {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
 }

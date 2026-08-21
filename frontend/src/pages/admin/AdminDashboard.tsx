@@ -17,6 +17,7 @@ import { fetchTrips } from '../../api/trips';
 import { Trip } from '../../api/types';
 import { ThemeSwitcher } from '../../components/ThemeSwitcher';
 import { StatusBadge } from '../../components/StatusBadge';
+import { AppTabs } from '../../components/AppTabs';
 import './AdminDashboard.css';
 
 export function AdminDashboard() {
@@ -45,78 +46,85 @@ export function AdminDashboard() {
           <IonTitle>Panel de administración</IonTitle>
           <IonButtons slot="end">
             <ThemeSwitcher />
-            <IonButton onClick={logout}>
+            <IonButton onClick={logout} aria-label="Cerrar sesión">
               <IonIcon icon={logOutOutline} slot="icon-only" />
             </IonButton>
           </IonButtons>
         </IonToolbar>
+        <AppTabs placement="top" />
       </IonHeader>
-      <IonContent className="ion-padding">
-        <div className="admin-dashboard__toolbar">
-          <div>
-            <h2>Viajes ({meta.total})</h2>
-            <p>Supervisa el estado de todos los viajes y sus reportes.</p>
+      <IonContent>
+        <div className="page-shell">
+          <div className="admin-dashboard__toolbar">
+            <div>
+              <h2>Viajes ({meta.total})</h2>
+              <p>Supervisa el estado de todos los viajes y sus reportes.</p>
+            </div>
+            <IonButton onClick={() => history.push('/admin/nuevo-viaje')}>
+              <IonIcon icon={addOutline} slot="start" />
+              Nuevo viaje
+            </IonButton>
           </div>
-          <IonButton onClick={() => history.push('/admin/nuevo-viaje')}>
-            <IonIcon icon={addOutline} slot="start" />
-            Nuevo viaje
-          </IonButton>
-        </div>
 
-        {loading ? (
-          <IonSpinner name="dots" />
-        ) : trips.length === 0 ? (
-          <p className="admin-dashboard__empty">Aún no hay viajes creados.</p>
-        ) : (
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Código</th>
-                <th>Ruta</th>
-                <th>Conductor</th>
-                <th>Pasajeros</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {trips.map((trip) => (
-                <tr
-                  key={trip.id}
-                  onClick={() => history.push(`/admin/trips/${trip.id}`)}
-                  className="admin-table__row"
-                >
-                  <td className="admin-table__code" data-label="Código">{trip.code}</td>
-                  <td data-label="Ruta">
-                    {trip.origin} → {trip.destination}
-                  </td>
-                  <td data-label="Conductor">{trip.driver?.fullName}</td>
-                  <td data-label="Pasajeros">
-                    {trip.passengers.filter((p) => p.boarded).length}/{trip.passengers.length}
-                  </td>
-                  <td data-label="Estado">
-                    <StatusBadge status={trip.status} />
-                  </td>
+          {loading ? (
+            <div className="ui-loading">
+              <IonSpinner name="dots" />
+            </div>
+          ) : trips.length === 0 ? (
+            <p className="admin-dashboard__empty">Aún no hay viajes creados.</p>
+          ) : (
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Ruta</th>
+                  <th>Conductor</th>
+                  <th>Pasajeros</th>
+                  <th>Estado</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+              </thead>
+              <tbody>
+                {trips.map((trip) => (
+                  <tr
+                    key={trip.id}
+                    onClick={() => history.push(`/admin/trips/${trip.id}`)}
+                    className="admin-table__row"
+                  >
+                    <td className="admin-table__code" data-label="Código">{trip.code}</td>
+                    <td data-label="Ruta">
+                      {trip.origin} → {trip.destination}
+                    </td>
+                    <td data-label="Conductor">{trip.driver?.fullName}</td>
+                    <td data-label="Pasajeros">
+                      {trip.passengers.filter((p) => p.boarded).length}/{trip.passengers.length}
+                    </td>
+                    <td data-label="Estado">
+                      <StatusBadge status={trip.status} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
 
-        {meta.totalPages > 1 && (
-          <div className="admin-dashboard__pagination">
-            {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((p) => (
-              <IonButton
-                key={p}
-                size="small"
-                fill={p === meta.page ? 'solid' : 'outline'}
-                onClick={() => load(p)}
-              >
-                {p}
-              </IonButton>
-            ))}
-          </div>
-        )}
+          {meta.totalPages > 1 && (
+            <div className="admin-dashboard__pagination">
+              {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((p) => (
+                <IonButton
+                  key={p}
+                  size="small"
+                  fill={p === meta.page ? 'solid' : 'outline'}
+                  onClick={() => load(p)}
+                >
+                  {p}
+                </IonButton>
+              ))}
+            </div>
+          )}
+        </div>
       </IonContent>
+
+      <AppTabs placement="bottom" />
     </IonPage>
   );
 }

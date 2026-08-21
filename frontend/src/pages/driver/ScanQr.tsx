@@ -9,7 +9,6 @@ import {
   IonTitle,
   IonButtons,
   IonBackButton,
-  IonText,
   IonSpinner,
   useIonViewDidEnter,
   useIonViewWillLeave,
@@ -98,24 +97,22 @@ export function ScanQr() {
           <IonTitle>Escanear QR del viaje</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding scan-qr-page">
-        <p className="scan-qr-page__hint">
-          Apunta la cámara al código QR que te entregó el administrador.
-        </p>
-        <div id={SCANNER_ELEMENT_ID} className="scan-qr-page__reader" />
+      <IonContent>
+        <div className="page-shell scan-qr-page">
+          <p className="scan-qr-page__hint">
+            Apunta la cámara al código QR que te entregó el administrador.
+          </p>
+          <div id={SCANNER_ELEMENT_ID} className="scan-qr-page__reader" />
 
-        {checking && (
-          <div className="scan-qr-page__status">
-            <IonSpinner name="dots" />
-            <p>Verificando viaje...</p>
-          </div>
-        )}
+          {checking && (
+            <div className="scan-qr-page__status">
+              <IonSpinner name="dots" />
+              <p>Verificando viaje...</p>
+            </div>
+          )}
 
-        {error && (
-          <IonText color="danger">
-            <p className="scan-qr-page__error">{error}</p>
-          </IonText>
-        )}
+          {error && <p className="scan-qr-page__error">{error}</p>}
+        </div>
       </IonContent>
     </IonPage>
   );
