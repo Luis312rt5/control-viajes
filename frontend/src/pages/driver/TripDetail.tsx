@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import {
   IonContent,
@@ -18,6 +18,7 @@ import {
   IonToast,
   IonCard,
   IonCardContent,
+  useIonViewWillEnter,
 } from '@ionic/react';
 import { fetchTrip, checkInPassenger, signTrip, startTrip, closeTrip } from '../../api/trips';
 import { Trip } from '../../api/types';
@@ -41,9 +42,12 @@ export function DriverTripDetail() {
     setLoading(false);
   }, [id]);
 
-  useEffect(() => {
+  // useIonViewWillEnter en vez de useEffect: recarga el viaje cada vez que
+  // volvés a esta pantalla (por ejemplo, tras escanear el QR de nuevo o
+  // volver del resumen), no solo la primera vez que se monta.
+  useIonViewWillEnter(() => {
     load();
-  }, [load]);
+  });
 
   const handleCheckIn = async (passengerId: string, boarded: boolean) => {
     if (!trip) return;

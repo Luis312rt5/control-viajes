@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState } from 'react';
+import { useParams, useHistory } from 'react-router-dom';
 import {
   IonContent,
   IonPage,
@@ -8,24 +8,29 @@ import {
   IonTitle,
   IonButtons,
   IonBackButton,
+  IonButton,
+  IonIcon,
   IonCard,
   IonCardContent,
   IonSpinner,
   IonList,
   IonItem,
   IonLabel,
+  useIonViewWillEnter,
 } from '@ionic/react';
+import { homeOutline } from 'ionicons/icons';
 import { fetchTripReport } from '../../api/trips';
 import { TripReport } from '../../api/types';
 import './TripSummary.css';
 
 export function TripSummary() {
   const { id } = useParams<{ id: string }>();
+  const history = useHistory();
   const [report, setReport] = useState<TripReport | null>(null);
 
-  useEffect(() => {
+  useIonViewWillEnter(() => {
     fetchTripReport(id).then(setReport);
-  }, [id]);
+  });
 
   if (!report) {
     return (
@@ -105,6 +110,15 @@ export function TripSummary() {
             </IonList>
           </IonCardContent>
         </IonCard>
+
+        <IonButton
+          expand="block"
+          className="trip-summary__home-btn"
+          onClick={() => history.push('/driver')}
+        >
+          <IonIcon icon={homeOutline} slot="start" />
+          Volver a mis viajes
+        </IonButton>
       </IonContent>
     </IonPage>
   );

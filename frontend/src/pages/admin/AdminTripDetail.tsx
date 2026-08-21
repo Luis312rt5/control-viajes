@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   IonContent,
@@ -13,6 +13,7 @@ import {
   IonItem,
   IonLabel,
   IonCheckbox,
+  useIonViewWillEnter,
 } from '@ionic/react';
 import { fetchTripReport } from '../../api/trips';
 import { TripReport } from '../../api/types';
@@ -25,9 +26,12 @@ export function AdminTripDetail() {
   const { id } = useParams<{ id: string }>();
   const [report, setReport] = useState<TripReport | null>(null);
 
-  useEffect(() => {
+  // useIonViewWillEnter en vez de useEffect: así el detalle se refresca
+  // también al volver a entrar (por ejemplo, después de que el conductor
+  // avanzó el viaje mientras el admin estaba en otra pantalla).
+  useIonViewWillEnter(() => {
     fetchTripReport(id).then(setReport);
-  }, [id]);
+  });
 
   if (!report) {
     return (

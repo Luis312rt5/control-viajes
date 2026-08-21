@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   IonContent,
@@ -10,6 +10,7 @@ import {
   IonButton,
   IonIcon,
   IonSpinner,
+  useIonViewWillEnter,
 } from '@ionic/react';
 import { logOutOutline, addOutline } from 'ionicons/icons';
 import { useAuth } from '../../contexts/AuthContext';
@@ -34,9 +35,13 @@ export function AdminDashboard() {
     setLoading(false);
   };
 
-  useEffect(() => {
-    load();
-  }, []);
+  // Igual que en DriverHome: Ionic no desmonta esta página al volver del
+  // detalle de un viaje, así que hacía falta el hook de ciclo de vida de
+  // Ionic (en vez de un useEffect de solo montaje) para que el estado se
+  // refresque cada vez que volvés a este panel.
+  useIonViewWillEnter(() => {
+    load(meta.page);
+  });
 
   return (
     <IonPage>

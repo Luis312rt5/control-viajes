@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   IonContent,
@@ -17,6 +17,7 @@ import {
   IonRefresher,
   IonRefresherContent,
   RefresherEventDetail,
+  useIonViewWillEnter,
 } from '@ionic/react';
 import { logOutOutline, busOutline, qrCodeOutline } from 'ionicons/icons';
 import { useAuth } from '../../contexts/AuthContext';
@@ -38,9 +39,16 @@ export function DriverHome() {
     setLoading(false);
   };
 
-  useEffect(() => {
+  // Ionic mantiene esta página viva en el stack de navegación cuando vas al
+  // detalle de un viaje y volvés atrás (no la desmonta), así que un
+  // useEffect(..., []) de solo montaje nunca se volvía a ejecutar al
+  // regresar — por eso el estado se veía desactualizado hasta cerrar sesión
+  // y volver a entrar (eso sí fuerza un montaje nuevo). useIonViewWillEnter
+  // se dispara cada vez que esta vista vuelve a quedar activa, incluyendo
+  // al volver atrás, así que la lista siempre recarga el estado más reciente.
+  useIonViewWillEnter(() => {
     load();
-  }, []);
+  });
 
   const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
     await load();
